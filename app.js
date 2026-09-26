@@ -120,7 +120,7 @@ function screenStatus() {
   const pb = ContentHub.getPlayback();
   return { title: pb?.title || state.title, playing: state.playing, narrating: state.narrating, chapter: state.chapter, chapters: state.chapters, volume: state.volume };
 }
-const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分</span></div>${assistantMessages.length ? `<div class="as-feed" id="asFeed">${assistantMessages.map(m => m.card ? `<div class="as-msg ${m.role}">${statusCardHTML(m.card)}</div>` : `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div>` : ''}<div class="sc-chat-actions"><button type="button" data-action="chat-go" data-tab="free"><i data-lucide="wand-sparkles"></i>自由创作</button><button type="button" data-action="chat-go" data-tab="templates"><i data-lucide="layout-template"></i>模板</button></div><div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
+const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分</span></div>${assistantMessages.length ? `<div class="as-feed" id="asFeed">${assistantMessages.map(m => m.card ? `<div class="as-msg ${m.role}">${statusCardHTML(m.card)}</div>` : `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div>` : ''}<div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
 
 const preview = (compact = false) => ['home','terminal'].includes(state.route) && ContentHub.getPlayback()
   ? ContentHub.playbackMedia(state.playing)
@@ -274,26 +274,41 @@ const terminalView = () => `
 
 const profileView = () => `
   <section class="ch-page"><h1 class="vs-sr-only">我的</h1>
-  <div class="ch-account"><span><i data-lucide="user-round"></i></span><div><strong>本地体验用户</strong><p>已保存 ${ContentHub.count()} 件内容</p></div></div>
+  <div class="ch-account"><span><i data-lucide="user-round"></i></span><div><strong>${escapeHTML((() => { try { return JSON.parse(localStorage.getItem('zrobot-user'))?.name || '本地体验用户'; } catch (_) { return '本地体验用户'; } })())}</strong><p>已保存 ${ContentHub.count()} 件内容</p></div></div>
   <div class="cr-card"><div class="cr-copy"><small>积分余额</small><strong>${Credits.get()}</strong><p>生成画面 2 积分/次 · 屏幕助手 1 积分/次</p></div><button class="cr-recharge" type="button" data-action="open-recharge">充值</button></div>
   <div class="ch-setting-list">
     <button type="button" data-route="home"><i data-lucide="monitor"></i>我的设备与屏幕<i data-lucide="chevron-right"></i></button>
     <button type="button" data-route="library"><i data-lucide="images"></i>我的作品<i data-lucide="chevron-right"></i></button>
     <button type="button" data-action="rebind"><i data-lucide="scan-line"></i>绑定设备<i data-lucide="chevron-right"></i></button>
-    <button type="button" data-action="local-privacy"><i data-lucide="shield-check"></i>素材与隐私<i data-lucide="chevron-right"></i></button>
     <button type="button" data-action="content-help"><i data-lucide="circle-help"></i>使用帮助<i data-lucide="chevron-right"></i></button>
   </div><p class="ch-local-note">当前为本地交互原型，真实账户、计费和设备服务待接入。</p></section>`;
 
 const wechatLoginView = () => `
   <section class="wx-login">
-    <div class="wx-badge"><i data-lucide="shield-check"></i>微信授权登录</div>
-    <img class="wx-logo" src="assets/zrobot-mark.png" alt="智显机器人" />
-    <h1>智显机器人</h1>
-    <p class="wx-scope">申请获取以下权限</p>
-    <ul class="wx-permissions"><li><i data-lucide="circle-user-round"></i>获得你的公开信息（昵称、头像）</li></ul>
-    <div class="wx-progress" role="status"><span></span><small id="wxLoginStatus">正在通过微信自动登录…</small></div>
-    <p class="wx-note">交互流程演示 · 未接入真实微信授权，登录后进入小程序首页</p>
+    <div class="wx-top"><img src="assets/zrobot-mark.png" alt=""/><strong>智显机器人</strong><small>微信官方登录</small></div>
+    <div class="wx-sheet">
+      <p class="wx-apply">申请获取以下权限</p>
+      <div class="wx-perm"><i data-lucide="smartphone"></i><div><strong>手机号</strong><small>用于登录与设备绑定</small></div><em>快速填充</em></div>
+      <div class="wx-perm"><i data-lucide="circle-user-round"></i><div><strong>昵称、头像</strong><small>用于展示个人资料</small></div><em>公开信息</em></div>
+      <p class="wx-agree">登录即代表同意 <u>用户协议</u> 与 <u>隐私政策</u></p>
+      <div class="wx-btns"><button class="wx-deny" type="button" data-action="wx-deny">拒绝</button><button class="wx-allow" type="button" data-action="wx-allow">允许</button></div>
+    </div>
+    <p class="wx-note">交互流程演示 · 未接入真实微信授权</p>
   </section>`;
+function wxAllowLogin(btn) {
+  if (btn.disabled) return;
+  btn.disabled = true; btn.textContent = '登录中…';
+  setTimeout(() => {
+    try { localStorage.setItem('zrobot-user', JSON.stringify({ name: '微信用户', via: 'wechat' })); } catch (_) {}
+    showToast('登录成功');
+    if (!Onboard.data().welcomed) { Onboard.mark('welcomed'); showIntroCarousel(); }
+    else navigate('library');
+  }, 900);
+}
+function showIntroCarousel() {
+  navigate('gallery');
+  setTimeout(() => openSheet(`<div class="ob-intro"><div class="ob-slide"><div class="ob-ico"><i data-lucide="wand-sparkles"></i></div><div><strong>① 一句话生成画面</strong><p>输入或说出想法，AI 立刻生成屏幕画面</p></div></div><div class="ob-slide"><div class="ob-ico"><i data-lucide="monitor-up"></i></div><div><strong>② 一键上屏</strong><p>预览满意后，内容立刻替换到你的智显屏</p></div></div><div class="ob-slide"><div class="ob-ico"><i data-lucide="bot"></i></div><div><strong>③ 说话即控制</strong><p>对助手说"开始讲解"，屏幕自动响应</p></div></div><div class="button-row single"><button class="primary-button" type="button" data-action="ob-start">开始体验</button></div></div>`), 350);
+}
 
 const views = { home: homeView, quickstart: quickstartView, gallery: galleryView, content: libraryView, library: libraryView, 'asset-detail':assetDetailView, 'project-history': () => ContentHub.history(), studio: () => VisualStudio.view(), templates: templatesView, editor: editorView, preview: previewView, terminal: terminalView, profile: profileView, 'wechat-login': wechatLoginView, create: () => ContentHub.createView() };
 
@@ -308,26 +323,9 @@ function render() {
   appContent.style.paddingBottom = focusedRoute ? '28px' : '112px';
   lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
   renderOrb();
-  if (state.route === 'wechat-login') runWechatLogin();
 }
 
 let wechatLoginStarted = false;
-function runWechatLogin() {
-  if (wechatLoginStarted) return;
-  wechatLoginStarted = true;
-  window.setTimeout(() => { const el = document.getElementById('wxLoginStatus'); if (el) el.textContent = '登录成功，正在进入小程序…'; }, 1700);
-  window.setTimeout(() => {
-    wechatLoginStarted = false;
-    showToast('微信登录成功，欢迎回来');
-    if (!Onboard.data().welcomed) {
-      Onboard.mark('welcomed');
-      navigate('gallery');
-      setTimeout(() => openSheet(`<h2>欢迎完成登录 👋</h2><p>从生图到上屏，只需 3 步：</p><p class="ob-steps"><strong>①</strong> 用一句话生成画面<br/><strong>②</strong> 预览并调整效果<br/><strong>③</strong> 一键上屏演示</p><p>点击「开始创作」，完成你的第一次上屏。</p><div class="button-row single"><button class="primary-button" type="button" data-action="ob-start">开始创作</button></div>`), 350);
-    } else {
-      navigate('library');
-    }
-  }, 2600);
-}
 
 function navigate(route) {
   const leavingStudio = state.route === 'studio' && route !== 'studio';
@@ -453,7 +451,6 @@ document.addEventListener('click', (event) => {
   if (!actionTarget) return;
   const action = actionTarget.dataset.action;
 
-  if(action === 'local-privacy')openSheet('<h2>素材保存在本机</h2><p>此原型将导入文件和作品保存在当前浏览器，不上传云端。清除浏览器数据会删除本地内容，请先导出原文件。</p><button type="button" class="ch-primary" data-action="cancel-sheet">知道了</button>');
   if(action === 'content-help')openSheet('<h2>从内容到屏幕</h2><p>创作用于制作与修改。内容库统一保存生成作品和上传文件，选择后预览上屏；文档须先转换。</p><p>编辑不会改变当前播放，确认发布后才切换。当前为本地演示，未连接真实盒子。</p><button type="button" class="ch-primary" data-action="cancel-sheet">知道了</button>');
 
   if (action === 'toggle-avatar') { state.digitalHuman = !state.digitalHuman; render(); }
@@ -480,6 +477,8 @@ document.addEventListener('click', (event) => {
   if (action === 'as-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('asInput'));
   if (action === 'orb-close') { closeOrb(); render(); }
   if (action === 'chat-go') { ContentHub.setTab?.(actionTarget.dataset.tab === 'templates' ? 'templates' : 'free'); navigate('create'); }
+  if (action === 'wx-allow') wxAllowLogin(actionTarget);
+  if (action === 'wx-deny') { showToast('已取消登录'); navigate('home'); }
   if (action === 'ob-start') { closeSheet(); navigate('create'); }
   if (action === 'ob-finish') { closeSheet(); navigate('home'); }
   if (action === 'orb-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('orbInput'));

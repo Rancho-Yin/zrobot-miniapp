@@ -197,22 +197,36 @@
 .cs-send { width:40px; height:40px; flex-shrink:0; border:0; border-radius:50%; background:#8848f5; color:#fff; display:grid; place-items:center; cursor:pointer; }
 .cs-send svg { width:19px; height:19px; }
 
-/* Simulated WeChat one-tap login splash before entering the app home. */
-.wx-login { min-height:100%; display:flex; flex-direction:column; align-items:center; padding:64px 30px 40px; text-align:center; background:#f3f5f7; }
-.wx-badge { display:inline-flex; align-items:center; gap:6px; min-height:30px; padding:0 14px; border-radius:999px; background:#07c160; color:#fff; font-size:12px; font-weight:600; }
-.wx-badge svg { width:14px; height:14px; }
-.wx-logo { width:84px; height:84px; margin-top:38px; border-radius:22px; box-shadow:0 12px 28px #8848f533; }
-.wx-login h1 { margin:16px 0 0; font-size:22px; letter-spacing:-.3px; color:#24272d; }
-.wx-scope { margin:26px 0 10px; align-self:flex-start; font-size:12px; color:#8b9199; }
-.wx-permissions { width:100%; list-style:none; margin:0; padding:0; }
-.wx-permissions li { display:flex; align-items:center; gap:9px; min-height:50px; padding:0 14px; border-radius:12px; background:#fff; font-size:13.5px; color:#3d434b; text-align:left; }
-.wx-permissions svg { width:17px; height:17px; color:#07c160; flex-shrink:0; }
-.wx-progress { display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:44px; width:100%; }
-.wx-progress span { display:block; width:132px; height:4px; border-radius:4px; background:#e3e6eb; overflow:hidden; position:relative; }
-.wx-progress span::after { content:''; position:absolute; inset:0; width:40%; border-radius:4px; background:#07c160; animation:wx-slide 1.1s ease-in-out infinite; }
-@keyframes wx-slide { 0% { transform:translateX(-100%);} 100% { transform:translateX(250%);} }
-.wx-progress small { font-size:12.5px; color:#6f757e; }
-.wx-note { margin-top:auto; font-size:11.5px; color:#a0a5ad; line-height:1.6; }
+/* WeChat official-style consent login. */
+.wx-login { min-height:100%; display:flex; flex-direction:column; background:#f3f5f7; }
+.wx-top { display:flex; flex-direction:column; align-items:center; gap:10px; padding:64px 30px 40px; }
+.wx-top img { width:76px; height:76px; border-radius:20px; box-shadow:0 12px 28px #8848f533; }
+.wx-top strong { font-size:20px; letter-spacing:-.3px; color:#24272d; }
+.wx-top small { color:#9aa0aa; font-size:11.5px; }
+.wx-sheet { margin-top:auto; background:#fff; border-radius:20px 20px 0 0; padding:20px 18px 14px; box-shadow:0 -8px 30px #24272d12; }
+.wx-apply { margin:0 0 6px; font-size:12px; color:#8b9199; }
+.wx-perm { display:flex; align-items:center; gap:12px; padding:13px 2px; border-bottom:1px solid #f0f1f4; }
+.wx-perm svg { width:19px; height:19px; color:#07c160; flex-shrink:0; }
+.wx-perm strong { display:block; font-size:14px; color:#24272d; }
+.wx-perm small { display:block; margin-top:2px; font-size:11.5px; color:#8b9199; }
+.wx-perm em { margin-left:auto; font-style:normal; font-size:10.5px; color:#8b9199; background:#f1f2f5; padding:3px 8px; border-radius:999px; white-space:nowrap; }
+.wx-agree { margin:12px 2px 14px; font-size:11px; color:#a0a5ad; text-align:center; }
+.wx-agree u { color:#6d28d9; }
+.wx-btns { display:flex; gap:10px; }
+.wx-deny,.wx-allow { flex:1; min-height:48px; border:0; border-radius:14px; font-size:15px; font-weight:600; cursor:pointer; }
+.wx-deny { background:#f1f2f5; color:#5b6472; }
+.wx-allow { background:#07c160; color:#fff; }
+.wx-allow:disabled { opacity:.7; }
+.wx-note { padding:12px 0 4px; text-align:center; font-size:11px; color:#a0a5ad; }
+
+/* First-run intro carousel (extremely simple: read 3 lines, tap once). */
+.ob-intro .ob-slide { display:flex; align-items:flex-start; gap:13px; padding:11px 0; border-bottom:1px solid #f0f1f4; }
+.ob-intro .ob-slide:last-of-type { border-bottom:0; }
+.ob-ico { width:44px; height:44px; border-radius:14px; background:#f1ebfc; display:grid; place-items:center; color:#8848f5; flex-shrink:0; }
+.ob-ico svg { width:20px; height:20px; }
+.ob-intro .ob-slide strong { font-size:14.5px; color:#24272d; }
+.ob-intro .ob-slide p { margin:4px 0 0; font-size:12px; color:#8b9199; line-height:1.55; }
+.ob-intro .button-row { margin-top:14px; }
 
 /* Creation feed: ChatGPT-style conversation of works, versions folded. */
 .cs-feed { display:flex;flex-direction:column;gap:28px;margin-bottom:8px; }
