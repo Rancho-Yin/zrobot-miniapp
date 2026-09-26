@@ -1,7 +1,7 @@
 /* Browser prototype: local compositing, persistence and animation; no AI or device API. */
 window.VisualStudio = (() => {
   const key = 'zrobot.visual-studio.v1';
-  const sample = 'assets/studio-product.svg';
+  const sample = 'assets/scene-gallery.jpg';
   const choices = {
     purpose: [['product','产品介绍','产品与卖点'],['launch','新品发布','突出主视觉'],['welcome','欢迎画面','清晰的来访信息'],['event','活动宣传','主题与时间']],
     scene: [['gallery','产品展台','干净的陈列空间'],['kitchen','明亮厨房','柔光与空间感'],['nature','自然光影','清新的绿色背景'],['studio','纯色空间','聚焦产品本身']],
@@ -16,7 +16,7 @@ window.VisualStudio = (() => {
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const copy = value => JSON.parse(JSON.stringify(value));
   const label = (type, id) => choices[type].find(x => x[0] === id)?.[1] || '';
-  const safeAsset = value => value === sample || value==='assets/art-atmosphere.svg' || /^data:image\/(png|jpeg|webp);base64,/.test(value || '');
+  const safeAsset = value => typeof value === 'string' && (value === sample || /^assets\/(scene|sample|art)-/.test(value) || /^data:image\/(png|jpeg|webp);base64,/.test(value));
   function sanitize(value) {
     const d={...base};
     if (!value || typeof value !== 'object') return d;
@@ -108,6 +108,7 @@ window.VisualStudio = (() => {
       if(token!==job)return;
       addVersion(snapshot,snapshot.prompt||`${label('scene',snapshot.scene)} · ${label('style',snapshot.style)}`);
       busy=false;dirty=JSON.stringify(snapshot)!==JSON.stringify(draft);draft.prompt='';persist();repaint();
+      hooks.onboard?.('gen');
       hooks.toast?.('已生成演示版本');
     },900);
   }
@@ -118,6 +119,7 @@ window.VisualStudio = (() => {
   }
   function saveVersion(){if(!dirty||busy)return;addVersion(draft,'保存修改');draft.prompt='';persist();repaint();hooks.toast?.('版本已保存');}
   function openPreview() {
+    hooks.onboard?.('prev');
     if(busy)return;
     const v=dirty||!current()?addVersion(draft,'文字或布局调整'):current();
     pending=copy(v);playing=false;persist();hooks.preview?.();

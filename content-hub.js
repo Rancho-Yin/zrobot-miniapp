@@ -35,10 +35,10 @@ window.ContentHub = (() => {
     const record=records.find(r=>r.project?.versions.some(x=>x.id===v.id));
     await setPlayback({sourceId:v.projectId||record?.id||null,versionId:v.id,title:v.data.title,type:'image',data:copy(v.data)});
   }
-  function playbackMedia(playing=false){if(!playback)return '';if(playback.data)return VisualStudio.artwork(playback.data,playing);return playback.type==='video'?`<video class="ch-screen-video" src="${esc(urlFor(playback))}" ${playing?'autoplay loop':''} muted playsinline controls aria-label="屏幕视频演示"></video>`:`<div class="ch-screen-image"><img src="${esc(urlFor(playback))}" alt="${esc(playback.title)}"/></div>`;}
+  function playbackMedia(playing=false){if(!playback)return '';if(playback.data)return VisualStudio.artwork(playback.data,playing);const src=urlFor(playback)||playback.src||'';return playback.type==='video'?`<video class="ch-screen-video" src="${esc(src)}" ${playing?'autoplay loop':''} muted playsinline controls aria-label="屏幕视频演示"></video>`:`<div class="ch-screen-image"><img src="${esc(src)}" alt="${esc(playback.title)}"/></div>`;}
   function nowPlaying(){return playback?`<button class="ch-now-playing" type="button" data-route="terminal" aria-label="控制当前播放"><span class="ch-now-cover">${playback.data?VisualStudio.artwork(playback.data,false,true):media(playback)}</span><span><small>${hooks.isPlaying?.()===false?'已暂停':'播放中'} · 演示</small><strong>${esc(playback.title)}</strong></span><i data-lucide="sliders-horizontal"></i></button>`:'';}
   function route(){return hooks.route?.()||'gallery';}
-  function redraw(){if(['gallery','library','asset-detail'].includes(route()))hooks.render?.();}
+  function redraw(){if(['gallery','library','asset-detail','create'].includes(route()))hooks.render?.();}
   async function put(record){
     if(!db)throw Error('本地存储尚未就绪，请稍后重试。');
     await new Promise((resolve,reject)=>{const tx=db.transaction('items','readwrite');tx.objectStore('items').put(record);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});
@@ -60,6 +60,7 @@ window.ContentHub = (() => {
       db=await new Promise((resolve,reject)=>{const req=indexedDB.open('zrobot-content-hub',2);req.onupgradeneeded=()=>{for(const store of ['items','playback'])if(!req.result.objectStoreNames.contains(store))req.result.createObjectStore(store,{keyPath:'id'});};req.onsuccess=()=>{req.result.onversionchange=()=>req.result.close();resolve(req.result);};req.onerror=()=>reject(req.error);req.onblocked=()=>{storageError='请关闭其他旧版原型页后刷新。';redraw();};});
       records=await new Promise((resolve,reject)=>{const req=db.transaction('items').objectStore('items').getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
       playback=await new Promise((resolve,reject)=>{const req=db.transaction('playback').objectStore('playback').get('current');req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error);});
+      if(records.length===0&&!localStorage.getItem('zrobot-seeded')){const t=Date.now();try{await put({id:'seed-coffee',title:'门店实拍 · 手冲咖啡',type:'image',src:'assets/sample-coffee.jpg',ext:'JPG',created:t-86400000,updated:t-86400000});await put({id:'seed-event',title:'新品发布 · 门店现场',type:'image',src:'assets/sample-event.jpg',ext:'JPG',created:t-172800000,updated:t-172800000});await put({id:'seed-video',title:'自然瞬间 · 氛围视频',type:'video',src:'assets/sample-video.mp4',ext:'MP4',previewReady:true,created:t-259200000,updated:t-259200000});try{localStorage.setItem('zrobot-seeded','1')}catch(_){}}catch(_){}}
       if(VisualStudio.getProject().versions.length)await saveProject();
       if(!playback&&VisualStudio.getPublished())await setStudioPlayback(VisualStudio.getPublished());
     }catch(_){storageError='本地存储不可用，导入暂不可用；仍可体验示例创作。';}
@@ -68,8 +69,9 @@ window.ContentHub = (() => {
   function filters(){return `<div class="ch-filters" aria-label="内容类型">${types.map(([id,title])=>`<button type="button" data-hub="filter" data-value="${id}" aria-pressed="${filter===id}">${title}</button>`).join('')}</div>`;}
   function media(record){
     if(record.project)return VisualStudio.artwork(versionOf(record)?.data||record.project.draft,false);
-    if(record.type==='image')return `<img src="${esc(urlFor(record))}" alt="${esc(record.title)}" class="ch-import-image"/>`;
-    if(record.type==='video')return `<div class="ch-film"><i data-lucide="play"></i><span>${esc(record.ext||'VIDEO')}</span><div class="ch-film-lines"></div></div>`;
+    const src=urlFor(record)||record.src||'';
+    if(record.type==='image')return `<img src="${esc(src)}" alt="${esc(record.title)}" class="ch-import-image"/>`;
+    if(record.type==='video')return src?`<video class="ch-vid" src="${esc(src)}#t=0.4" preload="metadata" muted playsinline></video>`:`<div class="ch-film"><i data-lucide="play"></i><span>${esc(record.ext||'VIDEO')}</span><div class="ch-film-lines"></div></div>`;
     return `<div class="ch-paper ${record.type}"><div class="ch-paper-header"><i data-lucide="${typeIcon(record.type)}"></i><span>${esc(record.ext||typeName(record.type))}</span></div><strong>${esc(record.title.replace(/\.[^.]+$/,''))}</strong><div class="ch-paper-lines"><b></b><b></b><b></b></div><small>${record.type==='html'?'网页文件':'文档资料'}</small></div>`;
   }
   function cards(items){return `<div class="ch-grid">${items.map(record=>`<article class="ch-card"><button class="ch-cover" type="button" data-hub="open" data-id="${record.id}" aria-label="打开 ${esc(record.title)}">${media(record)}<span class="ch-type">${typeName(record.type)}</span></button><div class="ch-card-caption"><button type="button" data-hub="open" data-id="${record.id}"><strong>${esc(record.title)}</strong></button><button type="button" class="ch-icon" data-hub="menu" data-id="${record.id}" aria-label="管理 ${esc(record.title)}"><i data-lucide="ellipsis"></i></button></div>${statusOf(record)?`<p class="${isCurrent(record)?'ch-playing-label':''}">${statusOf(record)}</p>`:''}<p class="ch-card-meta">${typeName(record.type)}${record.project?` · ${esc(CreationScenarios.name(record.project.draft.scenario))}`:''} · ${formatDate(record.updated)}</p></article>`).join('')}</div>`;}
@@ -132,7 +134,13 @@ window.ContentHub = (() => {
       const v=versionOf(r),n=r.project.versions.length;
       return `<article class="cs-card${n>1?' stacked':''}"><button class="cs-card-img" type="button" data-hub="open" data-id="${r.id}" aria-label="继续编辑 ${esc(r.title)}">${VisualStudio.artwork(v?.data||r.project.draft,false)}${n>1?`<span class="cs-card-count"><i data-lucide="layers"></i>${n} 个版本</span>`:''}</button><p class="cs-card-title">${esc(r.title)}</p></article>`;
     }).join('');
-    return `<section class="ch-page cs-page">${header('创作中心')}${works.length?`<div class="ch-section-title"><h2>我的创作</h2></div><div class="cs-grid">${feed}</div>`:''}<div class="ch-section-title"><h2>模板</h2></div>${officialCards(themes)}<div class="cs-chips" aria-label="灵感提示">${chips.map(([name,text])=>`<button type="button" data-hub="chip" data-value="${text}">${name}</button>`).join('')}</div><div class="cs-composer"><div class="cs-composer-pill"><button class="cs-attach" type="button" data-hub="import" aria-label="上传资料"><i data-lucide="plus"></i></button><input id="csComposerInput" type="text" placeholder="描述你想生成的画面…" maxlength="200" aria-label="描述你想生成的画面"/><button class="cs-attach cs-voice" type="button" data-hub="voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="cs-send" type="button" data-hub="quick-create" aria-label="生成"><i data-lucide="arrow-up"></i></button></div></div></section>`;
+    return `<section class="ch-page cs-page">${header('创作中心')}${window.Onboard?OnboardStrip():''}${works.length?`<div class="ch-section-title"><h2>我的创作</h2></div><div class="cs-grid">${feed}</div>`:`<div class="ch-empty ch-empty-quiet"><i data-lucide="images"></i><p>还没有作品，点右下角 + 开始创作</p></div>`}<button class="ch-fab" type="button" data-route="create" aria-label="生成画面"><i data-lucide="plus"></i></button></section>`;
+  }
+  function OnboardStrip(){const O=window.Onboard;if(!O)return '';return O.strip();}
+  let createTab='templates';
+  function createView(){
+    const tabBody=createTab==='templates'?officialCards(themes):`<div class="cs-idea-list">${chips.map(([name,text])=>`<button type="button" data-hub="chip" data-value="${text}"><i data-lucide="sparkles"></i><span><strong>${name}</strong><small>${esc(text)}</small></span><i data-lucide="arrow-up-right"></i></button>`).join('')}</div>`;
+    return `<section class="ch-page cs-page">${header('生成画面')}<div class="ch-detail-head"><button class="ch-icon" data-route="gallery" type="button" aria-label="返回创作中心"><i data-lucide="chevron-left"></i></button><span class="cs-page-tag">生成画面</span><span class="cs-credit">余额 ${window.Credits?window.Credits.get():'--'} 积分</span></div>${window.Onboard?OnboardStrip():''}<div class="cs-tabs"><button type="button" data-hub="create-tab" data-value="templates" aria-pressed="${createTab==='templates'}">模板</button><button type="button" data-hub="create-tab" data-value="ideas" aria-pressed="${createTab==='ideas'}">灵感</button></div><div class="cs-tabbody">${tabBody}</div><div class="cs-composer"><div class="cs-composer-pill"><button class="cs-attach" type="button" data-hub="import" aria-label="上传资料"><i data-lucide="plus"></i></button><input id="csComposerInput" type="text" placeholder="描述你想生成的画面…" maxlength="200" aria-label="描述你想生成的画面"/><button class="cs-attach cs-voice" type="button" data-hub="voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="cs-send" type="button" data-hub="quick-create" aria-label="生成"><i data-lucide="arrow-up"></i></button></div></div></section>`;
   }
   function library(){const list=visible(records);return `<section class="ch-page ch-library">${header('内容库')}${nowPlaying()}${search()}${filters()}${storageError?`<p class="ch-warning" role="alert">${esc(storageError)}</p>`:''}<div id="chResults">${!ready?'<p class="ch-empty">加载中…</p>':list.length?cards(list):`<div class="ch-empty"><i data-lucide="library"></i><h2>${query?'未找到内容':'暂无内容'}</h2><button class="ch-primary" data-hub="import" type="button">导入内容</button><button class="ch-text" data-route="gallery" type="button">去创作</button></div>`}</div>${!ready||list.length?'':`<div class="ch-section-title"><h2>优质示例</h2><span class="ch-section-sub">不同应用场景 · 持续更新</span></div>${officialCards(themes)}`}</section>`;}
   function newSheet(){hooks.openSheet(`<div class="ch-sheet-head"><h2>从什么开始？</h2><button class="ch-icon" type="button" data-hub="close" aria-label="关闭"><i data-lucide="x"></i></button></div><p>选择内容类型，保留你的原始素材。</p><div class="ch-new-options">${types.slice(1).map(([id,name,icon])=>`<button type="button" data-hub="new-type" data-value="${id}"><i data-lucide="${icon}"></i><span><strong>${name}</strong><small>${{image:'上传产品图，或从画布开始',video:'导入视频，或制作画面动效',slides:'导入演示文稿或PDF',word:'导入文字资料',html:'导入网页文件'}[id]}</small></span><i data-lucide="chevron-right"></i></button>`).join('')}</div>`);}
@@ -144,7 +152,7 @@ window.ContentHub = (() => {
     const r=records.find(x=>x.id===detailId);if(!r)return `<div class="ch-empty"><h2>内容已移除</h2><button class="ch-text" data-route="library" type="button">返回内容库</button></div>`;
     const documentType=['slides','word','html'].includes(r.type),draft=r.project&&!versionOf(r);
     const primary=documentType?`<button class="ch-primary" data-hub="conversion" data-id="${r.id}" type="button">准备上屏</button>`:draft?`<button class="ch-primary" data-hub="edit" data-id="${r.id}" type="button">继续创作</button>`:isCurrent(r)?'<button class="ch-primary" data-route="terminal" type="button">控制播放</button>':`<button class="ch-primary" data-hub="publish" data-id="${r.id}" type="button" ${!canPresent(r)||publishing?'disabled':''}>${playback?'替换当前内容':'上屏演示'}</button>`;
-    return `<section class="ch-page ch-preview-page"><div class="ch-detail-head"><button class="ch-icon" data-route="library" type="button" aria-label="返回内容库"><i data-lucide="chevron-left"></i></button><span>${typeName(r.type)}</span><button class="ch-icon" data-hub="menu" data-id="${r.id}" type="button" aria-label="管理内容"><i data-lucide="ellipsis"></i></button></div><h1 class="ch-detail-title">${esc(r.title)}</h1><div class="ch-detail-preview ${!documentType?'ch-display-frame':''}">${r.type==='video'?`<video data-preview-id="${r.id}" controls playsinline preload="auto" src="${esc(urlFor(r))}" aria-label="视频预览"></video>`:media(r)}</div>
+    return `<section class="ch-page ch-preview-page"><div class="ch-detail-head"><button class="ch-icon" data-route="library" type="button" aria-label="返回内容库"><i data-lucide="chevron-left"></i></button><span>${typeName(r.type)}</span><button class="ch-icon" data-hub="menu" data-id="${r.id}" type="button" aria-label="管理内容"><i data-lucide="ellipsis"></i></button></div><h1 class="ch-detail-title">${esc(r.title)}</h1><div class="ch-detail-preview ${!documentType?'ch-display-frame':''}">${r.type==='video'?`<video data-preview-id="${r.id}" controls playsinline preload="auto" src="${esc(urlFor(r)||r.src||'')}" aria-label="视频预览"></video>`:media(r)}</div>
       ${documentType?'<p class="ch-readiness">待处理 · 原文件已保存</p>':draft?'<p class="ch-readiness">草稿 · 生成后可上屏</p>':`<p class="ch-readiness">${r.type==='video'?'视频预览检查中…':`16:9${r.project?` · 版本 ${versionOf(r).number}`:' · 完整显示'}`}</p>`}
       ${r.project?.dirty&&versionOf(r)?'<p class="ch-subtle">预览为已生成版本，草稿修改未发布。</p>':''}
       <div class="ch-preview-actions">${!draft&&!documentType?'<p class="ch-subtle">我的智显屏 · 演示，未连接设备</p>':''}${primary}</div></section>`;
@@ -153,12 +161,12 @@ window.ContentHub = (() => {
     if(publishing||!canPresent(r))return;
     if(hooks.isOnline?.()===false){hooks.toast('设备离线，请连接后重试');return;}
     publishing=true;
-    const v=versionOf(r),snapshot={sourceId:r.id,title:r.title,type:r.type,...(v?{versionId:v.id,data:copy(v.data)}:{blob:r.blob,ext:r.ext})};
+    const v=versionOf(r),snapshot={sourceId:r.id,title:r.title,type:r.type,...(v?{versionId:v.id,data:copy(v.data)}:{blob:r.blob,src:r.src,ext:r.ext})};
     hooks.openSheet('<h2>上屏演示中…</h2><p>完成后切换，当前内容保持播放。</p>');
     try{
       await new Promise(resolve=>setTimeout(resolve,650));
       await setPlayback(snapshot);
-      hooks.openSheet('<div class="success-mark"><i data-lucide="check"></i></div><h2>上屏演示完成</h2><button class="ch-primary" type="button" data-hub="show-screen">查看屏幕</button>');
+      if(!hooks.onboard?.('pub'))hooks.openSheet('<div class="success-mark"><i data-lucide="check"></i></div><h2>上屏演示完成</h2><button class="ch-primary" type="button" data-hub="show-screen">查看屏幕</button>');
     }catch(_){hooks.openSheet('<h2>未能完成上屏</h2><p>当前播放未改变，请重试。</p><button class="ch-primary" data-hub="close" type="button">返回</button>');}
     finally{publishing=false;}
   }
@@ -205,6 +213,7 @@ window.ContentHub = (() => {
     if(a==='close')hooks.closeSheet();
     if(a==='filter'){filter=b.dataset.value;redraw();}
     if(a==='chip'){const input=document.getElementById('csComposerInput');if(input){input.value=b.dataset.value;input.focus();}}
+    if(a==='create-tab'){createTab=b.dataset.value;redraw();}
     if(a==='quick-create')await quickCreate();
     if(a==='voice')ZVoice.toggle(b,document.getElementById('csComposerInput'));
     if(a==='templates')hooks.openSheet(`<div class="ch-sheet-head"><h2>示例模板</h2><button class="ch-icon" data-hub="close" type="button" aria-label="关闭"><i data-lucide="x"></i></button></div>${officialCards(themes)}`);
@@ -236,5 +245,5 @@ window.ContentHub = (() => {
   document.addEventListener('submit',async e=>{if(e.target.id==='scenarioForm'){e.preventDefault();const seed=CreationScenarios.seed(new FormData(e.target),e.target.dataset.scenario);if(seed)await startProject(seed);else hooks.toast('请填写名称和说明');return;}if(e.target.id!=='hubRename')return;e.preventDefault();const r=records.find(x=>x.id===e.target.dataset.id);const title=new FormData(e.target).get('title').trim();if(!r||!title)return;try{await put({...r,title,renamed:true,updated:Date.now()});hooks.closeSheet();redraw();}catch(_){hooks.toast('保存失败，请重试');}});
   document.addEventListener('input',e=>{if(e.target.id!=='chSearch')return;query=e.target.value;const pos=e.target.selectionStart;redraw();const input=document.getElementById('chSearch');input?.focus();input?.setSelectionRange(pos,pos);});
   document.addEventListener('keydown',e=>{if(e.target.id==='csComposerInput'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();quickCreate();}});
-  return {init,gallery,library,detail,history,recent,queueSave,flushSave(){clearTimeout(timer);return saveProject();},saveProject,count:()=>records.length,playbackMedia,getPlayback:()=>playback?copy(playback):null,setStudioPlayback,clearPlayback};
+  return {init,gallery,createView,library,detail,history,recent,queueSave,flushSave(){clearTimeout(timer);return saveProject();},saveProject,count:()=>records.length,playbackMedia,getPlayback:()=>playback?copy(playback):null,setStudioPlayback,clearPlayback};
 })();

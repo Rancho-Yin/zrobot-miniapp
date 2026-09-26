@@ -3,9 +3,12 @@ const assert=require('node:assert/strict');
 const url=process.env.PROTOTYPE_URL||'http://127.0.0.1:4174/miniapp-prototype/index.html';
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});try{
 for(const width of [390,360,1440]){
- const p=await browser.newPage({viewport:{width,height:width===360?740:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ const p=await browser.newPage({viewport:{width,height:width===360?740:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));global.failPage=p;
  await p.goto(url+'?view=gallery');
- await p.getByRole('button',{name:'产品介绍',exact:true}).click();
+ await p.locator('.ch-fab').click();
+ await p.locator('#csComposerInput').waitFor({timeout:2500});
+ await p.locator('[data-hub="create-tab"][data-value="ideas"]').click();
+ await p.locator('[data-hub="chip"]').first().click();
  assert.equal(await p.locator('#csComposerInput').inputValue(),'介绍这款产品的核心卖点与使用场景');
  await p.screenshot({path:`/tmp/zrobot-composer-${width}.png`});
  await p.locator('#csComposerInput').fill('周末活动：门店精选商品，9月26日至27日');
@@ -26,7 +29,6 @@ for(const width of [390,360,1440]){
  await p.screenshot({path:`/tmp/zrobot-records-${width}.png`});
  await p.getByRole('button',{name:'查看版本 1',exact:true}).click();
  await p.getByRole('button',{name:'返回创作中心',exact:true}).click();
- await p.locator('#csComposerInput').waitFor({timeout:2500});
  await p.locator('.cs-card').first().waitFor({timeout:2500});
  await p.locator('.cs-card.stacked').first().waitFor({timeout:3000});
  assert.match(await p.locator('.cs-card-title').first().innerText(),/周末活动/);
@@ -34,16 +36,17 @@ for(const width of [390,360,1440]){
  await p.locator('.cs-card-img').first().click();
  await p.locator('#vsPrompt').waitFor({timeout:2500});
  await p.getByRole('button',{name:'返回创作中心',exact:true}).click();
- await p.locator('#csComposerInput').waitFor({timeout:2500});
- await p.locator('[data-hub="voice"]').waitFor({timeout:2500});
- await p.locator('.tab[data-route="library"]').click();assert.equal(await p.locator('.ch-material-grid').count(),0);await p.locator('.ch-cover').click();
+ await p.locator('.ch-fab').waitFor({timeout:2500});
+ await p.locator('.tab[data-route="library"]').click();assert.equal(await p.locator('.ch-material-grid').count(),0);await p.locator('.ch-cover').first().click();
  await p.getByRole('button',{name:'上屏演示',exact:true}).click();await p.getByRole('button',{name:'查看屏幕',exact:true}).click();
- await p.locator('.tab[data-route="library"]').click();await p.locator('.ch-cover').click();
+ await p.locator('.tab[data-route="library"]').click();await p.locator('.ch-cover').first().click();
  await p.getByRole('button',{name:'管理内容',exact:true}).click();
  await p.getByRole('button',{name:'收藏',exact:true}).click();
  await p.getByRole('button',{name:'返回内容库',exact:true}).click();
  await p.getByRole('button',{name:'只看收藏',exact:true}).click();assert.equal(await p.locator('.ch-card').count(),1);
  await p.locator('.tab[data-route="gallery"]').click();
+ await p.locator('.ch-fab').click();
+ await p.locator('[data-hub="create-tab"][data-value="templates"]').click();
  await p.locator('.cs-gallery .ch-cover').first().click();
  const tpl=await p.locator('#csComposerInput').inputValue();
  assert.match(tpl,/产品介绍/);
@@ -54,7 +57,7 @@ for(const width of [390,360,1440]){
  await p.waitForFunction(()=>VisualStudio.getProject().versions.length===1);
  assert.equal(await p.locator('.vs-canvas .vs-art-copy').count(),1);
  await p.getByRole('button',{name:'返回创作中心',exact:true}).click();
- await p.locator('#csComposerInput').waitFor({timeout:2500});
+ await p.locator('.ch-fab').waitFor({timeout:2500});
  await p.locator('.tab[data-route="home"]').click();
  await p.locator('#asInput').waitFor({timeout:2500});
  await p.locator('#asInput').fill('开始讲解');
@@ -69,5 +72,5 @@ for(const width of [390,360,1440]){
  assert.equal(await p.evaluate(()=>Number(localStorage.getItem('zrobot-credits-v1'))),75);
  await p.screenshot({path:`/tmp/zrobot-scene-gallery-${width}.png`});
  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);
- console.log(JSON.stringify({width,status:'PASS',flow:'embedded chat, grid feed with stacked versions, template prompt fill, auto generate, edits, publish, favorite, credits'}));await p.close();
-}}finally{await browser.close();}})().catch(e=>{console.error(e);process.exit(1)});
+ console.log(JSON.stringify({width,status:'PASS',flow:'fab to ChatGPT create page, ideas chip, real media, stacked grid, template prompt, onboarding publish, credits'}));await p.close();
+}}catch(e){if(global.failPage){await global.failPage.screenshot({path:'/tmp/zrobot-FAIL.png',fullPage:true});console.log('FAIL state url:',global.failPage.url());}throw e}finally{await browser.close();}})().catch(e=>{console.error(e);process.exit(1)});

@@ -82,6 +82,32 @@ function handleAssistant(raw) {
     if (state.route === 'home') { render(); appContent.scrollTop = appContent.scrollHeight; }
   }, 480);
 }
+window.Credits = Credits;
+const Onboard = {
+  data() { try { return JSON.parse(localStorage.getItem('zrobot-onboard')) || {}; } catch (_) { return {}; } },
+  mark(step) {
+    try {
+      const d = { ...this.data(), [step]: true };
+      if (step === 'pub') d.prev = true;
+      localStorage.setItem('zrobot-onboard', JSON.stringify(d));
+      if (!d.done && d.gen && d.prev && d.pub) {
+        d.done = true;
+        localStorage.setItem('zrobot-onboard', JSON.stringify(d));
+        openSheet(`<div class="success-mark"><i data-lucide="check"></i></div><h2>你已完成第一次上屏</h2><p>生成画面 → 预览调整 → 上屏演示，完整流程已经走通，屏幕正在播放你的内容。</p><div class="button-row single"><button class="primary-button" type="button" data-action="ob-finish">查看屏幕</button></div>`);
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  },
+  strip() {
+    const d = this.data();
+    if (d.done) return '';
+    const steps = [['gen','生成画面'],['prev','预览效果'],['pub','上屏演示']];
+    const n = steps.filter(([k]) => d[k]).length;
+    return `<div class="ob-strip"><span class="ob-tag">新手引导 ${n}/3</span>${steps.map(([k, name]) => `<em class="${d[k] ? 'ok' : ''}"><i data-lucide="${d[k] ? 'check' : 'circle'}"></i>${name}</em>`).join('')}</div>`;
+  }
+};
+window.Onboard = Onboard;
 function rechargeSheet() {
   return `<div class="ch-sheet-head"><h2>积分充值</h2><button class="ch-icon" type="button" data-action="cancel-sheet" aria-label="关闭"><i data-lucide="x"></i></button></div><p class="cr-note">生成画面 2 积分/次 · 屏幕助手 1 积分/次</p><div class="cr-plans">${[[60, 6], [400, 30], [1000, 68]].map(([c, p]) => `<button class="cr-plan" type="button" data-action="recharge" data-amount="${c}"><span><strong>${c} 积分</strong><small>¥${p}</small></span><i data-lucide="chevron-right"></i></button>`).join('')}</div>`;
 }
@@ -260,15 +286,15 @@ const wechatLoginView = () => `
     <p class="wx-note">交互流程演示 · 未接入真实微信授权，登录后进入小程序首页</p>
   </section>`;
 
-const views = { home: homeView, quickstart: quickstartView, gallery: galleryView, content: libraryView, library: libraryView, 'asset-detail':assetDetailView, 'project-history': () => ContentHub.history(), studio: () => VisualStudio.view(), templates: templatesView, editor: editorView, preview: previewView, terminal: terminalView, profile: profileView, 'wechat-login': wechatLoginView };
+const views = { home: homeView, quickstart: quickstartView, gallery: galleryView, content: libraryView, library: libraryView, 'asset-detail':assetDetailView, 'project-history': () => ContentHub.history(), studio: () => VisualStudio.view(), templates: templatesView, editor: editorView, preview: previewView, terminal: terminalView, profile: profileView, 'wechat-login': wechatLoginView, create: () => ContentHub.createView() };
 
 function render() {
   document.querySelector('.phone').classList.toggle('visual-creation', state.route === 'studio');
   const view = views[state.route] || homeView;
   appContent.innerHTML = view();
-  const navRoute = ['content','asset-detail'].includes(state.route) ? 'library' : ['studio','project-history','templates','editor','preview'].includes(state.route) ? 'gallery' : ['terminal','quickstart'].includes(state.route) ? 'home' : state.route;
+  const navRoute = ['content','asset-detail'].includes(state.route) ? 'library' : ['studio','project-history','templates','editor','preview','create'].includes(state.route) ? 'gallery' : ['terminal','quickstart'].includes(state.route) ? 'home' : state.route;
   document.querySelectorAll('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.route === navRoute));
-  const focusedRoute = ['studio','project-history','templates','editor','preview','asset-detail','wechat-login'].includes(state.route) || (state.route === 'quickstart' && state.quickstartStage !== 'success');
+  const focusedRoute = ['studio','project-history','templates','editor','preview','asset-detail','wechat-login','create'].includes(state.route) || (state.route === 'quickstart' && state.quickstartStage !== 'success');
   document.querySelector('.tab-bar').style.display = focusedRoute ? 'none' : 'grid';
   appContent.style.paddingBottom = focusedRoute ? '28px' : '112px';
   lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
@@ -281,7 +307,17 @@ function runWechatLogin() {
   if (wechatLoginStarted) return;
   wechatLoginStarted = true;
   window.setTimeout(() => { const el = document.getElementById('wxLoginStatus'); if (el) el.textContent = '登录成功，正在进入小程序…'; }, 1700);
-  window.setTimeout(() => { wechatLoginStarted = false; navigate('library'); showToast('微信登录成功，欢迎回来'); }, 2600);
+  window.setTimeout(() => {
+    wechatLoginStarted = false;
+    showToast('微信登录成功，欢迎回来');
+    if (!Onboard.data().welcomed) {
+      Onboard.mark('welcomed');
+      navigate('gallery');
+      setTimeout(() => openSheet(`<h2>欢迎完成登录 👋</h2><p>从生图到上屏，只需 3 步：</p><p class="ob-steps"><strong>①</strong> 用一句话生成画面<br/><strong>②</strong> 预览并调整效果<br/><strong>③</strong> 一键上屏演示</p><p>点击「开始创作」，完成你的第一次上屏。</p><div class="button-row single"><button class="primary-button" type="button" data-action="ob-start">开始创作</button></div>`), 350);
+    } else {
+      navigate('library');
+    }
+  }, 2600);
 }
 
 function navigate(route) {
@@ -434,6 +470,8 @@ document.addEventListener('click', (event) => {
   if (action === 'as-chip') handleAssistant(actionTarget.dataset.value);
   if (action === 'as-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('asInput'));
   if (action === 'orb-close') { closeOrb(); render(); }
+  if (action === 'ob-start') { closeSheet(); navigate('create'); }
+  if (action === 'ob-finish') { closeSheet(); navigate('home'); }
   if (action === 'orb-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('orbInput'));
 });
 
@@ -451,11 +489,13 @@ document.getElementById('profileButton').addEventListener('click', () => navigat
 
 VisualStudio.init({render,navigate,toast:showToast,openSheet,closeSheet,changed:()=>ContentHub.queueSave(),
   spend:(n,reason)=>Credits.spend(n,reason),
+  onboard:(step)=>Onboard.mark(step),
   preview(){state.previewSource='visual';navigate('preview');},
   async published(version){await ContentHub.setStudioPlayback(version);state.title=version.data.title;state.subtitle=version.data.subtitle;state.digitalHuman=false;state.narrating=false;state.playing=true;render();},
   cleared(){ContentHub.clearPlayback().catch(()=>showToast('播放状态未保存，请刷新重试'));}
 });
 ContentHub.init({render,navigate,toast:showToast,openSheet,closeSheet,route:()=>state.route,isOnline:()=>state.terminalOnline,isPlaying:()=>state.playing,
-  onPlayback(){state.playing=true;state.narrating=false;state.digitalHuman=false;render();}
+  onPlayback(){state.playing=true;state.narrating=false;state.digitalHuman=false;render();},
+  onboard:(step)=>Onboard.mark(step)
 });
 render();
