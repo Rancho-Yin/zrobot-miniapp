@@ -85,12 +85,20 @@ window.ContentHub = (() => {
   }
   function officialCards(items){return `<div class="ch-grid cs-gallery">${items.map(t=>`<article class="ch-card"><button type="button" class="ch-cover" data-hub="template" data-id="${t.id}" aria-label="使用 ${t.title}">${VisualStudio.artwork(templateData(t),false)}<span class="cs-glabel">${t.title}</span></button></article>`).join('')}</div>`;}
   const chips=[['产品介绍','介绍这款产品的核心卖点与使用场景'],['活动通知','宣布本周末的会员活动，突出时间与地点'],['欢迎接待','欢迎来访嘉宾，传递热情与专业'],['艺术氛围','生成一张纯净的艺术氛围画面']];
+  const themePrompts={
+    'tpl-product':'为「产品介绍」生成一张宣传画面。产品名称：[替换成产品名]；核心卖点：[一句话卖点]；产品在简约展台陈列，标题突出产品名称，风格简约克制。',
+    'tpl-launch':'为「新品发布」生成一张发布主视觉。新品名称：[替换]；最大亮点：[一句话]；纯色空间聚焦产品，使用醒目的品牌色，风格鲜明。',
+    'tpl-welcome':'为「欢迎接待」生成一张欢迎画面。欢迎对象：[来访嘉宾或活动名称]；欢迎语：[替换]；信息清晰简洁，传递热情与专业，风格简约。',
+    'tpl-event':'为「活动预告」生成一张预告画面。活动主题：[替换]；时间地点：[替换]；暖光氛围营造好时光即将开始的感觉，风格温暖。'
+  };
   async function quickCreate(){
     const input=document.getElementById('csComposerInput');
     const text=(input?.value||'').trim();
     if(!text){hooks.toast?.('先描述你想生成的画面');return;}
     if(!await saveProject()){hooks.toast?.(storageError);return;}
-    const seed={scenario:'free',title:text.slice(0,18),subtitle:text.length>18?text.slice(18,60):'',prompt:text};
+    const title=text.split(/[。；;！!？?\n]/)[0].trim().slice(0,18)||'未命名作品';
+    const rest=text.slice(title.length).replace(/^[。；;！!？?\n\s]+/,'');
+    const seed={scenario:'free',title,subtitle:rest.slice(0,60),prompt:text};
     if(VisualStudio.newProject(seed)){hooks.navigate('studio');setTimeout(()=>VisualStudio.triggerGenerate(),450);}
   }
   const ZVoice={
@@ -122,9 +130,9 @@ window.ContentHub = (() => {
     const works=[...records].filter(r=>r.project).sort((a,b)=>b.updated-a.updated);
     const feed=works.map(r=>{
       const v=versionOf(r),n=r.project.versions.length;
-      return `<article class="cs-msg"><div class="cs-msg-q"><p>${esc(v?.request||r.title)}</p></div><button class="cs-msg-img" type="button" data-hub="open" data-id="${r.id}" aria-label="继续编辑 ${esc(r.title)}">${VisualStudio.artwork(v?.data||r.project.draft,false)}</button><div class="cs-msg-meta"><span>${formatDate(r.updated)}${r.project.dirty?' · 有修改':''}</span>${n>1?`<details class="cs-versions"><summary><i data-lucide="history"></i>${n} 个版本<i data-lucide="chevron-down"></i></summary><div class="cs-version-list">${[...r.project.versions].reverse().map(x=>`<button type="button" data-hub="history-version" data-id="${r.id}" data-version="${x.id}">${VisualStudio.artwork(x.data,false,true)}<span>版本 ${x.number}${x.id===r.project.selected?' · 当前':''}<small>${esc(x.request||x.note||'')}</small></span><i data-lucide="chevron-right"></i></button>`).join('')}</div></details>`:''}</div></article>`;
+      return `<article class="cs-card${n>1?' stacked':''}"><button class="cs-card-img" type="button" data-hub="open" data-id="${r.id}" aria-label="继续编辑 ${esc(r.title)}">${VisualStudio.artwork(v?.data||r.project.draft,false)}${n>1?`<span class="cs-card-count"><i data-lucide="layers"></i>${n} 个版本</span>`:''}</button><p class="cs-card-title">${esc(r.title)}</p></article>`;
     }).join('');
-    return `<section class="ch-page cs-page">${header('创作中心')}${works.length?`<div class="cs-feed">${feed}</div>`:''}<div class="ch-section-title"><h2>模板</h2></div>${officialCards(themes)}<div class="cs-chips" aria-label="灵感提示">${chips.map(([name,text])=>`<button type="button" data-hub="chip" data-value="${text}">${name}</button>`).join('')}</div><div class="cs-composer"><div class="cs-composer-pill"><button class="cs-attach" type="button" data-hub="import" aria-label="上传资料"><i data-lucide="plus"></i></button><input id="csComposerInput" type="text" placeholder="描述你想生成的画面…" maxlength="120" aria-label="描述你想生成的画面"/><button class="cs-attach cs-voice" type="button" data-hub="voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="cs-send" type="button" data-hub="quick-create" aria-label="生成"><i data-lucide="arrow-up"></i></button></div></div></section>`;
+    return `<section class="ch-page cs-page">${header('创作中心')}${works.length?`<div class="ch-section-title"><h2>我的创作</h2></div><div class="cs-grid">${feed}</div>`:''}<div class="ch-section-title"><h2>模板</h2></div>${officialCards(themes)}<div class="cs-chips" aria-label="灵感提示">${chips.map(([name,text])=>`<button type="button" data-hub="chip" data-value="${text}">${name}</button>`).join('')}</div><div class="cs-composer"><div class="cs-composer-pill"><button class="cs-attach" type="button" data-hub="import" aria-label="上传资料"><i data-lucide="plus"></i></button><input id="csComposerInput" type="text" placeholder="描述你想生成的画面…" maxlength="200" aria-label="描述你想生成的画面"/><button class="cs-attach cs-voice" type="button" data-hub="voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="cs-send" type="button" data-hub="quick-create" aria-label="生成"><i data-lucide="arrow-up"></i></button></div></div></section>`;
   }
   function library(){const list=visible(records);return `<section class="ch-page ch-library">${header('内容库')}${nowPlaying()}${search()}${filters()}${storageError?`<p class="ch-warning" role="alert">${esc(storageError)}</p>`:''}<div id="chResults">${!ready?'<p class="ch-empty">加载中…</p>':list.length?cards(list):`<div class="ch-empty"><i data-lucide="library"></i><h2>${query?'未找到内容':'暂无内容'}</h2><button class="ch-primary" data-hub="import" type="button">导入内容</button><button class="ch-text" data-route="gallery" type="button">去创作</button></div>`}</div>${!ready||list.length?'':`<div class="ch-section-title"><h2>优质示例</h2><span class="ch-section-sub">不同应用场景 · 持续更新</span></div>${officialCards(themes)}`}</section>`;}
   function newSheet(){hooks.openSheet(`<div class="ch-sheet-head"><h2>从什么开始？</h2><button class="ch-icon" type="button" data-hub="close" aria-label="关闭"><i data-lucide="x"></i></button></div><p>选择内容类型，保留你的原始素材。</p><div class="ch-new-options">${types.slice(1).map(([id,name,icon])=>`<button type="button" data-hub="new-type" data-value="${id}"><i data-lucide="${icon}"></i><span><strong>${name}</strong><small>${{image:'上传产品图，或从画布开始',video:'导入视频，或制作画面动效',slides:'导入演示文稿或PDF',word:'导入文字资料',html:'导入网页文件'}[id]}</small></span><i data-lucide="chevron-right"></i></button>`).join('')}</div>`);}
@@ -209,7 +217,7 @@ window.ContentHub = (() => {
     }
     if(a==='import-type')importFile(b.dataset.value);
     if(a==='blank')await startProject(b.dataset.value==='video'?{motion:'push'}:{showText:false});
-    if(a==='template')createFromTemplate(themes.find(t=>t.id===b.dataset.id));
+    if(a==='template'){const t=themes.find(x=>x.id===b.dataset.id);const input=document.getElementById('csComposerInput');if(t&&input){input.value=themePrompts[t.id]||t.title;input.focus();input.scrollIntoView({block:'center'});}}
     if(a==='open')open(b.dataset.id);
     if(a==='history-version'&&r?.project){if(VisualStudio.loadProject(r.project,{versionId:b.dataset.version}))hooks.navigate('studio');}
     if(a==='history-edit'&&r?.project){if(VisualStudio.loadProject(r.project))hooks.navigate('studio');}
@@ -228,5 +236,5 @@ window.ContentHub = (() => {
   document.addEventListener('submit',async e=>{if(e.target.id==='scenarioForm'){e.preventDefault();const seed=CreationScenarios.seed(new FormData(e.target),e.target.dataset.scenario);if(seed)await startProject(seed);else hooks.toast('请填写名称和说明');return;}if(e.target.id!=='hubRename')return;e.preventDefault();const r=records.find(x=>x.id===e.target.dataset.id);const title=new FormData(e.target).get('title').trim();if(!r||!title)return;try{await put({...r,title,renamed:true,updated:Date.now()});hooks.closeSheet();redraw();}catch(_){hooks.toast('保存失败，请重试');}});
   document.addEventListener('input',e=>{if(e.target.id!=='chSearch')return;query=e.target.value;const pos=e.target.selectionStart;redraw();const input=document.getElementById('chSearch');input?.focus();input?.setSelectionRange(pos,pos);});
   document.addEventListener('keydown',e=>{if(e.target.id==='csComposerInput'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();quickCreate();}});
-  return {init,gallery,library,detail,history,recent,queueSave,saveProject,count:()=>records.length,playbackMedia,getPlayback:()=>playback?copy(playback):null,setStudioPlayback,clearPlayback};
+  return {init,gallery,library,detail,history,recent,queueSave,flushSave(){clearTimeout(timer);return saveProject();},saveProject,count:()=>records.length,playbackMedia,getPlayback:()=>playback?copy(playback):null,setStudioPlayback,clearPlayback};
 })();

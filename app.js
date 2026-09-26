@@ -73,22 +73,19 @@ function handleAssistant(raw) {
   const text = String(raw || '').trim();
   if (!text) return;
   assistantMessages.push({ role: 'user', text });
-  if (state.route === 'assistant') render();
+  if (state.route === 'home') render();
   if (!Credits.spend(1, '屏幕助手对话')) return;
   const reply = assistantAct(text);
   setTimeout(() => {
     assistantMessages.push({ role: 'assistant', text: reply.text });
     reply.run?.();
-    if (state.route === 'assistant') render();
+    if (state.route === 'home') { render(); appContent.scrollTop = appContent.scrollHeight; }
   }, 480);
 }
 function rechargeSheet() {
   return `<div class="ch-sheet-head"><h2>积分充值</h2><button class="ch-icon" type="button" data-action="cancel-sheet" aria-label="关闭"><i data-lucide="x"></i></button></div><p class="cr-note">生成画面 2 积分/次 · 屏幕助手 1 积分/次</p><div class="cr-plans">${[[60, 6], [400, 30], [1000, 68]].map(([c, p]) => `<button class="cr-plan" type="button" data-action="recharge" data-amount="${c}"><span><strong>${c} 积分</strong><small>¥${p}</small></span><i data-lucide="chevron-right"></i></button>`).join('')}</div>`;
 }
-const assistantView = () => `<div class="as-page">${backHeader('屏幕助手', '语音与文字，控制你的智显屏', 'home')}
-  <div class="as-feed" id="asFeed">${assistantMessages.map(m => `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div>
-  <div class="as-chips">${['开始讲解', '暂停播放', '下一章节', '查看积分'].map(c => `<button type="button" data-action="as-chip" data-value="${c}">${c}</button>`).join('')}</div>
-  <div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
+const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分</span></div><div class="as-feed" id="asFeed">${assistantMessages.map(m => `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div><div class="as-chips">${['开始讲解', '暂停播放', '下一章节', '查看积分'].map(c => `<button type="button" data-action="as-chip" data-value="${c}">${c}</button>`).join('')}</div><div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
 
 const preview = (compact = false) => ['home','terminal'].includes(state.route) && ContentHub.getPlayback()
   ? ContentHub.playbackMedia(state.playing)
@@ -132,7 +129,7 @@ const homeView = () => `<div class="home-wrap">
 
   <div class="section-title"><h2>最近内容</h2><button type="button" data-route="library">查看全部</button></div>
   ${ContentHub.recent()}
-  <button class="sc-assistant" type="button" data-route="assistant"><i data-lucide="sparkles"></i><div><strong>屏幕智能助手</strong><small>说话即可控制屏幕 · 讲解 · 查询</small></div><i data-lucide="chevron-right"></i></button></div>`;
+  ${assistantChatBlock()}</div>`;
 
 const quickstartProgress = () => `
   <div class="quickstart-progress" aria-label="快速上屏进度">
@@ -263,20 +260,19 @@ const wechatLoginView = () => `
     <p class="wx-note">交互流程演示 · 未接入真实微信授权，登录后进入小程序首页</p>
   </section>`;
 
-const views = { home: homeView, quickstart: quickstartView, gallery: galleryView, content: libraryView, library: libraryView, 'asset-detail':assetDetailView, 'project-history': () => ContentHub.history(), studio: () => VisualStudio.view(), templates: templatesView, editor: editorView, preview: previewView, terminal: terminalView, profile: profileView, 'wechat-login': wechatLoginView, assistant: assistantView };
+const views = { home: homeView, quickstart: quickstartView, gallery: galleryView, content: libraryView, library: libraryView, 'asset-detail':assetDetailView, 'project-history': () => ContentHub.history(), studio: () => VisualStudio.view(), templates: templatesView, editor: editorView, preview: previewView, terminal: terminalView, profile: profileView, 'wechat-login': wechatLoginView };
 
 function render() {
   document.querySelector('.phone').classList.toggle('visual-creation', state.route === 'studio');
   const view = views[state.route] || homeView;
   appContent.innerHTML = view();
-  const navRoute = ['content','asset-detail'].includes(state.route) ? 'library' : ['studio','project-history','templates','editor','preview'].includes(state.route) ? 'gallery' : ['terminal','quickstart','assistant'].includes(state.route) ? 'home' : state.route;
+  const navRoute = ['content','asset-detail'].includes(state.route) ? 'library' : ['studio','project-history','templates','editor','preview'].includes(state.route) ? 'gallery' : ['terminal','quickstart'].includes(state.route) ? 'home' : state.route;
   document.querySelectorAll('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.route === navRoute));
-  const focusedRoute = ['studio','project-history','templates','editor','preview','asset-detail','wechat-login','assistant'].includes(state.route) || (state.route === 'quickstart' && state.quickstartStage !== 'success');
+  const focusedRoute = ['studio','project-history','templates','editor','preview','asset-detail','wechat-login'].includes(state.route) || (state.route === 'quickstart' && state.quickstartStage !== 'success');
   document.querySelector('.tab-bar').style.display = focusedRoute ? 'none' : 'grid';
   appContent.style.paddingBottom = focusedRoute ? '28px' : '112px';
   lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
   renderOrb();
-  if (state.route === 'assistant' && assistantMessages.length > 1) appContent.scrollTop = appContent.scrollHeight;
   if (state.route === 'wechat-login') runWechatLogin();
 }
 
@@ -289,8 +285,10 @@ function runWechatLogin() {
 }
 
 function navigate(route) {
-  if(state.route === 'studio' && route !== 'studio') VisualStudio.leave();
+  const leavingStudio = state.route === 'studio' && route !== 'studio';
+  if (leavingStudio) VisualStudio.leave();
   state.route = route;
+  if (leavingStudio) ContentHub.flushSave?.();
   appContent.scrollTop = 0;
   render();
 }
