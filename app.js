@@ -13,6 +13,9 @@ const state = {
   title: '让未来，由此展开',
   subtitle: '智显机器人 · AI内容即刻上屏',
   previewSource: 'studio',
+  volume: 62,
+  chapter: 1,
+  chapters: 3,
   quickstartStage: 'input',
   quickstartUploaded: false,
   quickstartPrompt: '',
@@ -57,13 +60,13 @@ function openOrb() { orbOpen = true; renderOrb(); }
 function closeOrb() { orbOpen = false; renderOrb(); }
 function assistantAct(t) {
   const has = (...ws) => ws.some(w => t.includes(w));
-  if (has('结束讲解', '关闭讲解', '停止讲解')) return { text: '已结束讲解。', run: () => { state.narrating = false; closeOrb(); render(); } };
-  if (has('讲解', '解说', '语音播报')) return { text: '好的，已进入讲解模式，我为你讲述当前画面。', run: () => { state.narrating = true; state.playing = true; render(); openOrb(); } };
-  if (has('暂停')) return { text: '已暂停播放。', run: () => { state.playing = false; render(); } };
-  if (has('继续播放', '开始播放', '继续', '播放')) return { text: '继续播放。', run: () => { state.playing = true; render(); } };
-  if (has('下一', '换个')) return { text: '已切换到下一章节。', run: () => showToast('已切换到下一章节') };
-  if (has('上一')) return { text: '已切换到上一章节。', run: () => showToast('已切换到上一章节') };
-  if (has('音量')) return { text: has('大', '高') ? '已调大音量。' : '已调小音量。', run: () => showToast('音量已调整') };
+  if (has('结束讲解', '关闭讲解', '停止讲解')) return { text: '已结束讲解。', card: true, run: () => { state.narrating = false; closeOrb(); render(); } };
+  if (has('讲解', '解说', '语音播报')) return { text: '好的，已进入讲解模式，我为你讲述当前画面。', card: true, run: () => { state.narrating = true; state.playing = true; render(); openOrb(); } };
+  if (has('暂停')) return { text: '已暂停播放。', card: true, run: () => { state.playing = false; render(); } };
+  if (has('继续播放', '开始播放', '继续', '播放')) return { text: '继续播放。', card: true, run: () => { state.playing = true; render(); } };
+  if (has('下一', '换个')) return { text: '已切换到下一章节。', card: true, run: () => { state.chapter = Math.min(state.chapters, state.chapter + 1); render(); } };
+  if (has('上一')) return { text: '已切换到上一章节。', card: true, run: () => { state.chapter = Math.max(1, state.chapter - 1); render(); } };
+  if (has('音量')) { const up = has('大', '高'); return { text: up ? '已调大音量。' : '已调小音量。', card: true, run: () => { state.volume = Math.max(0, Math.min(100, state.volume + (up ? 20 : -20))); render(); } }; }
   if (has('积分', '余额', '还剩')) return { text: `当前剩余 ${Credits.get()} 积分。生成画面消耗 2 积分/次，屏幕助手 1 积分/次，充值在「我的」页面。` };
   if (has('换内容', '更换', '换画面', '上屏')) return { text: '为你打开内容库，选一条内容即可替换上屏。', run: () => navigate('library') };
   if (has('帮助', '能做什么', '怎么用')) return { text: '你可以试试：开始讲解、暂停播放、下一章节、音量小一点、查看积分、更换内容。' };
@@ -77,8 +80,10 @@ function handleAssistant(raw) {
   if (!Credits.spend(1, '屏幕助手对话')) return;
   const reply = assistantAct(text);
   setTimeout(() => {
-    assistantMessages.push({ role: 'assistant', text: reply.text });
     reply.run?.();
+    const msg = { role: 'assistant', text: reply.text };
+    if (reply.card) msg.card = screenStatus();
+    assistantMessages.push(msg);
     if (state.route === 'home') { render(); appContent.scrollTop = appContent.scrollHeight; }
   }, 480);
 }
@@ -112,7 +117,12 @@ window.Onboard = Onboard;
 function rechargeSheet() {
   return `<div class="ch-sheet-head"><h2>积分充值</h2><button class="ch-icon" type="button" data-action="cancel-sheet" aria-label="关闭"><i data-lucide="x"></i></button></div><p class="cr-note">生成画面 2 积分/次 · 屏幕助手 1 积分/次</p><div class="cr-plans">${[[60, 6], [400, 30], [1000, 68]].map(([c, p]) => `<button class="cr-plan" type="button" data-action="recharge" data-amount="${c}"><span><strong>${c} 积分</strong><small>¥${p}</small></span><i data-lucide="chevron-right"></i></button>`).join('')}</div>`;
 }
-const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分</span></div><div class="as-feed" id="asFeed">${assistantMessages.map(m => `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div><div class="as-chips">${['开始讲解', '暂停播放', '下一章节', '查看积分'].map(c => `<button type="button" data-action="as-chip" data-value="${c}">${c}</button>`).join('')}</div><div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
+const statusCardHTML = (c) => `<div class="as-status-card"><div class="as-status-head"><i data-lucide="monitor"></i><strong>我的智显屏</strong><em>在线</em></div><div class="as-status-title">${escapeHTML(c.title)}</div><ul><li><i data-lucide="${c.playing ? 'play' : 'pause'}"></i>播放<cite>${c.playing ? '播放中' : '已暂停'}</cite></li><li><i data-lucide="bot"></i>讲解<cite>${c.narrating ? '进行中' : '未开启'}</cite></li><li><i data-lucide="list-ordered"></i>章节<cite>${c.chapter} / ${c.chapters}</cite></li><li><i data-lucide="volume-2"></i>音量<cite>${c.volume}%</cite></li></ul></div>`;
+function screenStatus() {
+  const pb = ContentHub.getPlayback();
+  return { title: pb?.title || state.title, playing: state.playing, narrating: state.narrating, chapter: state.chapter, chapters: state.chapters, volume: state.volume };
+}
+const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分</span></div><div class="as-feed" id="asFeed">${assistantMessages.map(m => m.card ? `<div class="as-msg ${m.role}">${statusCardHTML(m.card)}</div>` : `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div><div class="as-chips">${['开始讲解', '暂停播放', '下一章节', '查看积分'].map(c => `<button type="button" data-action="as-chip" data-value="${c}">${c}</button>`).join('')}</div><div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
 
 const preview = (compact = false) => ['home','terminal'].includes(state.route) && ContentHub.getPlayback()
   ? ContentHub.playbackMedia(state.playing)
@@ -255,7 +265,7 @@ const terminalView = () => `
       <button class="main" type="button" data-action="toggle-play" aria-label="播放暂停"><i data-lucide="${state.playing ? 'pause' : 'play'}"></i></button>
       <button type="button" data-action="next" aria-label="下一项"><i data-lucide="skip-forward"></i></button>
     </div>
-    <div class="volume"><i data-lucide="volume-1"></i><input type="range" min="0" max="100" value="62" aria-label="音量" /><i data-lucide="volume-2"></i></div>
+    <div class="volume"><i data-lucide="volume-1"></i><input type="range" min="0" max="100" value="${state.volume}" aria-label="音量" /><i data-lucide="volume-2"></i></div>
     <div class="remote-actions">
       <button type="button" data-action="start-narration"><i data-lucide="bot"></i>${state.narrating ? '结束讲解' : '开始讲解'}</button>
       <button type="button" data-action="previous"><i data-lucide="list-restart"></i>上一章节</button>
@@ -458,8 +468,8 @@ document.addEventListener('click', (event) => {
   if (action === 'publish-done') { closeSheet(); VisualStudio.clearPublished(); state.narrating = true; state.playing = true; navigate('terminal'); }
   if (action === 'toggle-play') { state.playing = !state.playing; render(); showToast(state.playing ? '继续播放' : '已暂停'); }
   if (action === 'start-narration') { state.narrating = !state.narrating; state.playing = true; render(); showToast(state.narrating ? '数字人开始讲解' : '已结束讲解'); }
-  if (action === 'previous') showToast('已切换到上一章节');
-  if (action === 'next') showToast('已切换到下一章节');
+  if (action === 'previous') { state.chapter = Math.max(1, state.chapter - 1); showToast(`已切换到上一章节 · ${state.chapter}/${state.chapters}`); }
+  if (action === 'next') { state.chapter = Math.min(state.chapters, state.chapter + 1); showToast(`已切换到下一章节 · ${state.chapter}/${state.chapters}`); }
   if (action === 'upload') showToast('原型中已模拟素材上传');
   if (action === 'rebind') openSheet(`<h2>扫描盒子小程序码</h2><p>重新绑定将替换当前唯一终端。正式版本会调用微信扫码能力。</p><div class="button-row"><button class="secondary-button" type="button" data-action="cancel-sheet">取消</button><button class="primary-button purple" type="button" data-action="simulate-bind">模拟绑定</button></div>`);
   if (action === 'cancel-sheet') closeSheet();
@@ -476,6 +486,7 @@ document.addEventListener('click', (event) => {
   if (action === 'orb-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('orbInput'));
 });
 
+document.addEventListener('input', (e) => { if (e.target.matches?.('.volume input')) state.volume = Number(e.target.value); });
 document.addEventListener('keydown', (e) => {
   if (['asInput', 'orbInput'].includes(e.target.id) && e.key === 'Enter' && !e.isComposing) {
     e.preventDefault();
@@ -487,6 +498,23 @@ document.addEventListener('keydown', (e) => {
 
 modalLayer.addEventListener('click', (event) => { if (event.target === modalLayer) closeSheet(); });
 document.getElementById('profileButton').addEventListener('click', () => navigate('profile'));
+function applyTheme() {
+  let t = null;
+  try { t = localStorage.getItem('zrobot-theme'); } catch (_) {}
+  if (t !== 'dark' && t !== 'light') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.querySelector('.phone').setAttribute('data-theme', t);
+}
+function toggleTheme() {
+  const next = document.querySelector('.phone').getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem('zrobot-theme', next); } catch (_) {}
+  document.querySelector('.phone').setAttribute('data-theme', next);
+  const i = document.querySelector('#themeButton i');
+  if (i) i.setAttribute('data-lucide', next === 'dark' ? 'sun' : 'moon');
+  lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
+  showToast(next === 'dark' ? '已切换深色模式' : '已切换浅色模式');
+}
+document.getElementById('themeButton').addEventListener('click', toggleTheme);
+applyTheme();
 
 VisualStudio.init({render,navigate,toast:showToast,openSheet,closeSheet,changed:()=>ContentHub.queueSave(),
   spend:(n,reason)=>Credits.spend(n,reason),

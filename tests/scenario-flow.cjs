@@ -65,6 +65,8 @@ for(const width of [390,360,1440]){
  await p.locator('.orb-layer .orb').waitFor({timeout:3000});
  await p.screenshot({path:`/tmp/zrobot-orb-${width}.png`});
  await p.locator('[data-action="orb-close"]').click();
+ await p.locator('.as-status-card').first().waitFor({timeout:2500});
+ assert.match(await p.locator('.as-status-card').first().innerText(),/章节/);
  assert.equal(await p.evaluate(()=>Number(localStorage.getItem('zrobot-credits-v1'))),15);
  await p.locator('.tab[data-route="profile"]').click();
  await p.getByRole('button',{name:'充值',exact:true}).click();

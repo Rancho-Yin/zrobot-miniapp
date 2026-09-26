@@ -269,3 +269,7 @@
 .scene-gallery .vs-art-copy { color:#20262d; background:#ffffff78; text-shadow:0 1px 5px #ffffffa3; }
 .scene-gallery .vs-art-brand { color:#20262d; text-shadow:0 1px 5px #ffffffa3; }
 .scene-gallery .vs-art-world::after { background:linear-gradient(180deg,#ffffff2e,#0000 45%,#0000001c); }
+
+/* Dark mode: studio base surfaces. */
+.phone[data-theme=dark] .vs-studio { background:#101014; }
+.phone[data-theme=dark] .vs-topbar { background:#101014; }

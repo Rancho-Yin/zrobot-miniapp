@@ -185,7 +185,8 @@
 .cs-glabel { position:absolute; left:13px; bottom:12px; z-index:3; max-width:calc(100% - 26px); color:#fff; font-size:14.5px; font-weight:600; letter-spacing:-.1px; text-shadow:0 1px 10px #00000059; }
 .cs-chips { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; margin:18px -16px 4px; padding:0 16px; }
 .cs-chips::-webkit-scrollbar { display:none; }
-.cs-chips button { flex-shrink:0; min-height:40px; padding:0 16px; border:1px solid #e3e5ea; border-radius:999px; background:#fff; color:#3d434b; font-size:13px; cursor:pointer; }
+.cs-chips button { flex-shrink:0; min-height:40px; padding:0 16px; border:1px solid #e3e5ea; border-radius:999px; background:#fff; color:#3d434b; font-size:13px; cursor:pointer; transition:background var(--t-fast) ease, transform var(--t-fast) ease; }
+.cs-chips button:active { transform:scale(.96); }
 .cs-chips button:active { background:#f1f2f5; }
 .cs-composer { position:sticky; bottom:0; z-index:6; margin-top:auto; padding:26px 0 6px; background:linear-gradient(transparent,#f5f5f7 34%); }
 .cs-composer-pill { display:flex; align-items:center; gap:2px; height:54px; padding:0 7px; border-radius:27px; background:#e7e9ee; box-shadow:0 8px 22px #24272d14; }
@@ -318,7 +319,8 @@
 
 /* Create page (ChatGPT-style generation screen). */
 .ch-page { position:relative; }
-.ch-fab { position:absolute; right:18px; bottom:22px; z-index:6; width:56px; height:56px; border:0; border-radius:18px; background:#8848f5; color:#fff; display:grid; place-items:center; cursor:pointer; box-shadow:0 14px 30px #8848f554; }
+.ch-fab { position:absolute; right:18px; bottom:22px; z-index:6; width:56px; height:56px; border:0; border-radius:18px; background:#8848f5; color:#fff; display:grid; place-items:center; cursor:pointer; box-shadow:0 14px 30px #8848f554; transition:transform var(--t-fast) ease, box-shadow var(--t-med) ease; }
+.ch-fab:active { transform:scale(.94); }
 .ch-fab svg { width:24px; height:24px; }
 .cs-page-tag { font-size:13px; font-weight:600; color:#24272d; }
 .cs-credit { margin-left:auto; font-size:11.5px; color:#8b9199; }
@@ -355,3 +357,64 @@
 .ob-next em { display:block; margin-top:2px; font-style:normal; font-size:11px; color:#8b9199; }
 .ob-next b { font-size:10.5px; color:#a4aab2; font-weight:500; border:1px solid #e3e5ea; padding:2px 8px; border-radius:999px; white-space:nowrap; }
 .ob-steps strong { color:#8848f5; margin-right:4px; }
+
+/* Screen status card (assistant chat). */
+.as-status-card { max-width:92%; background:#fff; border:1px solid #e7e8ee; border-radius:16px; padding:12px 14px; box-shadow:0 6px 18px #24272d0f; }
+.as-status-head { display:flex; align-items:center; gap:7px; }
+.as-status-head svg { width:15px; height:15px; color:#8848f5; }
+.as-status-head strong { font-size:12.5px; color:#24272d; }
+.as-status-head em { margin-left:auto; font-style:normal; font-size:10.5px; color:#24885d; background:#e9f5ef; padding:2px 8px; border-radius:999px; }
+.as-status-title { margin:9px 0 8px; font-size:13px; font-weight:600; color:#24272d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.as-status-body ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:7px 10px; }
+.as-status-body li { display:flex; align-items:center; gap:6px; font-size:11.5px; color:#8b8f97; }
+.as-status-body li svg { width:13px; height:13px; color:#8848f5; }
+.as-status-body cite { margin-left:auto; font-style:normal; font-weight:600; color:#2b3035; }
+
+/* Empty state with brand mark. */
+.ch-empty-brand { width:64px; height:64px; border-radius:18px; margin:4px auto 14px; box-shadow:0 10px 24px #8848f52e; display:block; }
+
+/* Dark surfaces for content-hub components. */
+.phone[data-theme=dark] .ch-page { color:#e7e8eb; }
+.phone[data-theme=dark] .ch-search { background:#23252b; }
+.phone[data-theme=dark] .ch-search input { color:#e7e8eb; }
+.phone[data-theme=dark] .ch-filters button { color:#9aa0aa; }
+.phone[data-theme=dark] .ch-filters button[aria-pressed=true] { color:#eceef2; }
+.phone[data-theme=dark] .ch-section-title h2 { color:#eceef2; }
+.phone[data-theme=dark] .ch-list-label { color:#8b8f97; }
+.phone[data-theme=dark] .ch-card-caption>button:first-child { color:#e7e8eb; }
+.phone[data-theme=dark] .ch-card-meta { color:#7d838d; }
+.phone[data-theme=dark] .ch-empty { color:#9aa0aa; }
+.phone[data-theme=dark] .ch-empty h2 { color:#eceef2; }
+.phone[data-theme=dark] .ch-text { color:#cfd2d8; }
+.phone[data-theme=dark] .ch-warning { color:#f2b8b8; }
+.phone[data-theme=dark] .cs-tabs { background:#23252b; }
+.phone[data-theme=dark] .cs-tabs button { color:#9aa0aa; }
+.phone[data-theme=dark] .cs-tabs button[aria-pressed=true] { background:#1a1b20; color:#eceef2; }
+.phone[data-theme=dark] .cs-chips button { background:#1a1b20; border-color:#2a2c33; color:#cfd2d8; }
+.phone[data-theme=dark] .cs-composer-pill { background:#23252b; }
+.phone[data-theme=dark] #csComposerInput { color:#e7e8eb; }
+.phone[data-theme=dark] .cs-idea-list button { background:#1a1b20; border-color:#2a2c33; }
+.phone[data-theme=dark] .cs-idea-list strong { color:#eceef2; }
+.phone[data-theme=dark] .cs-card-title { color:#e7e8eb; }
+.phone[data-theme=dark] .cs-page-tag { color:#eceef2; }
+.phone[data-theme=dark] .as-composer input { background:#23252b; color:#e7e8eb; }
+.phone[data-theme=dark] .as-msg.assistant p { background:#23252b; color:#e7e8eb; }
+.phone[data-theme=dark] .sc-chat-head strong { color:#eceef2; }
+.phone[data-theme=dark] .sc-chat-head span { color:#8b8f97; }
+.phone[data-theme=dark] .as-status-card { background:#1a1b20; border-color:#2a2c33; }
+.phone[data-theme=dark] .as-status-head strong { color:#eceef2; }
+.phone[data-theme=dark] .as-status-title { color:#eceef2; }
+.phone[data-theme=dark] .as-status-body li { color:#8b8f97; }
+.phone[data-theme=dark] .as-status-body cite { color:#cfd2d8; }
+.phone[data-theme=dark] .ob-strip { background:#1a1b20; border-color:#2a2c33; }
+.phone[data-theme=dark] .ob-strip .ob-tag { color:#a78bfa; }
+.phone[data-theme=dark] .ob-strip em { color:#7d838d; }
+.phone[data-theme=dark] .ob-strip em.ok { color:#a78bfa; }
+.phone[data-theme=dark] .cr-plan { background:#1a1b20; border-color:#2a2c33; }
+.phone[data-theme=dark] .cr-plan strong { color:#eceef2; }
+.phone[data-theme=dark] .ob-next strong { color:#eceef2; }
+.phone[data-theme=dark] .ob-next>div { border-color:#23252b; }
+.phone[data-theme=dark] .sheet { background:#1a1b20; color:#e7e8eb; }
+.phone[data-theme=dark] .sheet h2 { color:#eceef2; }
+.phone[data-theme=dark] .sheet p { color:#9aa0aa; }
+.phone[data-theme=dark] .secondary-button { background:#23252b; color:#e7e8eb; }
