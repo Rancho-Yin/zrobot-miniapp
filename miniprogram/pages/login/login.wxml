@@ -1,0 +1,10 @@
+<view class="page">
+  <view class="top"><image src="/assets/logo.png"/><text class="name">智显机器人</text><text class="sub">微信官方登录</text></view>
+  <view class="sheet">
+    <text class="apply">申请获取以下权限</text>
+    <view class="perm"><text class="pico">📱</text><view class="pc"><text class="pt">手机号</text><text class="pd">用于登录与设备绑定</text></view><text class="ptag">快速填充</text></view>
+    <view class="perm"><text class="pico">👤</text><view class="pc"><text class="pt">昵称、头像</text><text class="pd">用于展示个人资料</text></view><text class="ptag">公开信息</text></view>
+    <text class="agree">登录即代表同意 用户协议 与 隐私政策</text>
+    <view class="btns"><button class="deny" bindtap="deny">拒绝</button><button class="allow" open-type="getPhoneNumber" bindgetphonenumber="allow">允许</button></view>
+  </view>
+</view>

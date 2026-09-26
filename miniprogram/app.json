@@ -1,0 +1,33 @@
+{
+  "pages": [
+    "pages/gallery/gallery",
+    "pages/home/home",
+    "pages/library/library",
+    "pages/profile/profile",
+    "pages/create/create",
+    "pages/studio/studio",
+    "pages/terminal/terminal",
+    "pages/login/login"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#f4f5f7",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "智显机器人",
+    "backgroundColor": "#f4f5f7"
+  },
+  "tabBar": {
+    "color": "#8a8f98",
+    "selectedColor": "#6c4ce8",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/gallery/gallery", "text": "创作", "iconPath": "assets/tab-create.png", "selectedIconPath": "assets/tab-create-active.png" },
+      { "pagePath": "pages/library/library", "text": "内容库", "iconPath": "assets/tab-library.png", "selectedIconPath": "assets/tab-library-active.png" },
+      { "pagePath": "pages/home/home", "text": "屏幕", "iconPath": "assets/tab-home.png", "selectedIconPath": "assets/tab-home-active.png" },
+      { "pagePath": "pages/profile/profile", "text": "我的", "iconPath": "assets/tab-profile.png", "selectedIconPath": "assets/tab-profile-active.png" }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

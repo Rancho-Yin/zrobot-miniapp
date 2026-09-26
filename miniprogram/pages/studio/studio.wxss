@@ -1,0 +1,15 @@
+.canvas { position: relative; border-radius: 28rpx; overflow: hidden; background: #101014; }
+.canvas image { width: 100%; height: 420rpx; display: block; }
+.vbadge { position: absolute; right: 16rpx; top: 16rpx; background: rgba(38,49,58,.75); color: #fff; font-size: 21rpx; padding: 4rpx 14rpx; border-radius: 999rpx; }
+.qa { display: flex; gap: 16rpx; margin: 20rpx 0; }
+.qbtn { flex: 1; text-align: center; background: #17181c; color: #fff; border-radius: 18rpx; padding: 22rpx; font-size: 27rpx; font-weight: 600; }
+.form { background: #fff; border-radius: 24rpx; padding: 8rpx 24rpx; margin-bottom: 20rpx; }
+.field { display: flex; align-items: center; gap: 18rpx; padding: 22rpx 0; border-bottom: 1rpx solid #f0f1f4; }
+.field text { width: 130rpx; font-size: 25rpx; color: #8b9199; }
+.field input { flex: 1; font-size: 27rpx; }
+.ask { background: #fff; border-radius: 24rpx; padding: 20rpx; display: flex; gap: 16rpx; align-items: flex-end; }
+.ask textarea { flex: 1; min-height: 60rpx; font-size: 26rpx; }
+.askbtn { background: #8848f5; color: #fff; }
+.rec { margin-top: 24rpx; }
+.rt { font-size: 27rpx; font-weight: 700; }
+.ritem { display: flex; justify-content: space-between; padding: 18rpx 4rpx; border-bottom: 1rpx solid #f0f1f4; font-size: 24rpx; color: #5b6472; }

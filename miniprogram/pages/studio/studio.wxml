@@ -1,0 +1,19 @@
+<view class="page">
+  <view class="canvas">
+    <image wx:if="{{work.imageUrl || work.url}}" src="{{work.imageUrl || work.url}}" mode="aspectFill"/>
+    <text class="vbadge">v{{versions.length || 1}}</text>
+  </view>
+  <view class="qa">
+    <view class="qbtn" bindtap="save">保存版本</view>
+    <view class="qbtn" bindtap="publish">上屏演示</view>
+  </view>
+  <view class="form">
+    <view class="field"><text>主标题</text><input value="{{title}}" bindinput="editTitle" maxlength="36"/></view>
+    <view class="field"><text>说明文字</text><input value="{{subtitle}}" bindinput="editSub" maxlength="80"/></view>
+  </view>
+  <view class="ask">
+    <textarea value="{{follow}}" placeholder="想改哪里？描述一个变化…" bindinput="onFollow" auto-height maxlength="200"/>
+    <button class="askbtn" size="mini" bindtap="ask" disabled="{{busy}}">{{busy ? '生成中…' : '生成'}}</button>
+  </view>
+  <view class="rec"><text class="rt">创作记录</text><view class="ritem" wx:for="{{versions}}" wx:key="index"><text class="rnote">{{item.note || item.date}}</text><text class="rdate">{{item.date}}</text></view></view>
+</view>

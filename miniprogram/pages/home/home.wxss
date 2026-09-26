@@ -1,0 +1,39 @@
+.page { padding-bottom: 320rpx; }
+.head { display: flex; justify-content: space-between; align-items: center; padding: 4rpx 4rpx 16rpx; }
+.label { font-size: 26rpx; color: #5b6472; }
+.status { font-size: 22rpx; color: #24885d; }
+.stage { border-radius: 24rpx; overflow: hidden; background: #101014; }
+.media { width: 100%; height: 400rpx; display: block; }
+.meta { display: flex; align-items: center; gap: 16rpx; padding: 18rpx 4rpx; }
+.meta .t { font-size: 30rpx; font-weight: 700; color: #24272d; }
+.meta .s { font-size: 22rpx; color: #969ca4; }
+.meta .r { margin-left: auto; font-size: 22rpx; color: #969ca4; }
+.change { display: flex; align-items: center; gap: 18rpx; background: #17181c; border-radius: 20rpx; padding: 26rpx 26rpx; color: #fff; margin-bottom: 18rpx; }
+.change .ci { width: 56rpx; height: 56rpx; border-radius: 12rpx; background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; }
+.change .ct { flex: 1; font-size: 30rpx; font-weight: 600; }
+.tools { display: flex; border: 1rpx solid #e3e5ea; border-radius: 20rpx; overflow: hidden; background: #fff; margin-bottom: 26rpx; }
+.tools view { flex: 1; text-align: center; padding: 26rpx 0; font-size: 26rpx; font-weight: 600; color: #24272d; border-right: 1rpx solid #eee; }
+.tools view:last-child { border-right: 0; }
+.chat { position: relative; background: #fff; border-radius: 28rpx 28rpx 0 0; padding: 20rpx 20rpx 24rpx; box-shadow: 0 -10rpx 30rpx rgba(36,39,45,.06); }
+.chat-head { display: flex; align-items: center; gap: 10rpx; padding-bottom: 12rpx; }
+.spark { color: #8848f5; }
+.chat-head .ct { font-size: 27rpx; font-weight: 700; color: #24272d; }
+.chat-head .cr { margin-left: auto; font-size: 22rpx; color: #8b9199; }
+.msgs { max-height: 400rpx; overflow-y: auto; padding-bottom: 8rpx; }
+.msg { display: flex; margin-bottom: 16rpx; }
+.msg.user { justify-content: flex-end; }
+.bubble { max-width: 84%; padding: 18rpx 24rpx; border-radius: 28rpx; font-size: 26rpx; line-height: 1.55; }
+.msg.user .bubble { background: #8848f5; color: #fff; border-radius: 28rpx 28rpx 8rpx 28rpx; }
+.msg.assistant .bubble { background: #eef0f4; color: #2b3035; border-radius: 28rpx 28rpx 28rpx 8rpx; }
+.status-card { max-width: 92%; background: #fff; border: 1rpx solid #e7e8ee; border-radius: 28rpx; padding: 22rpx; box-shadow: 0 10rpx 30rpx rgba(36,39,45,.06); }
+.sc-head { display: flex; align-items: center; gap: 10rpx; }
+.sc-t { font-size: 25rpx; font-weight: 700; color: #24272d; }
+.sc-on { margin-left: auto; font-size: 20rpx; color: #24885d; background: #e9f5ef; padding: 3rpx 14rpx; border-radius: 999rpx; }
+.sc-title { margin: 14rpx 0; font-size: 26rpx; font-weight: 600; color: #24272d; }
+.sc-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx 18rpx; }
+.sc-row { display: flex; align-items: center; font-size: 22rpx; color: #8b8f97; }
+.sc-row b { margin-left: auto; color: #2b3035; }
+.composer { display: flex; align-items: center; gap: 12rpx; margin-top: 6rpx; }
+.composer input { flex: 1; height: 84rpx; background: #e9ebef; border-radius: 42rpx; padding: 0 30rpx; font-size: 27rpx; }
+.mic { width: 84rpx; height: 84rpx; border-radius: 50%; background: #e9ebef; display: flex; align-items: center; justify-content: center; font-size: 22rpx; color: #565d66; }
+.send { width: 84rpx; height: 84rpx; border-radius: 50%; background: #8848f5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 34rpx; font-weight: 700; }

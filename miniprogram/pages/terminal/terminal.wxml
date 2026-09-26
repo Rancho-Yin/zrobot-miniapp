@@ -1,0 +1,14 @@
+<view class="page">
+  <view class="head"><text class="label">现场遥控</text><text class="status">● 已连接</text></view>
+  <view class="stage">{{cur.title || '品牌产品介绍'}}</view>
+  <view class="panel">
+    <view class="line"><text>播放控制</text><text>{{playing ? '正在播放' : '已暂停'}}</text></view>
+    <view class="transport">
+      <view bindtap="prev">⏮</view>
+      <view class="main" bindtap="toggle">{{playing ? '⏸' : '▶'}}</view>
+      <view bindtap="next">⏭</view>
+    </view>
+    <view class="vol">🔈<slider min="0" max="100" value="{{volume}}" activeColor="#6c4ce8" bindchange="vol"/>🔊</view>
+    <view class="narr" bindtap="narrate">{{narrating ? '结束讲解' : '开始讲解'}}</view>
+  </view>
+</view>

@@ -1,0 +1,18 @@
+<view class="page">
+  <view class="account" bindtap="goLogin">
+    <view class="ava"><text>👤</text></view>
+    <view class="acc"><text class="name">{{name}}</text><text class="sub">{{logged ? '微信已登录' : '点击登录，解锁完整体验'}}</text></view>
+    <text class="chev">›</text>
+  </view>
+  <view class="cr-card">
+    <view class="cr-copy"><text class="cl">积分余额</text><text class="cv">{{credits}}</text><text class="cp">生成 2 积分/次 · 助手 1 积分/次</text></view>
+    <button class="cr-btn" bindtap="recharge">充值</button>
+  </view>
+  <view class="rows">
+    <view class="row" bindtap="goHome"><text>📺</text>我的设备与屏幕<text class="chev">›</text></view>
+    <view class="row" bindtap="goLibrary"><text>🖼</text>我的作品<text class="chev">›</text></view>
+    <view class="row" bindtap="bind"><text>🔗</text>绑定设备<text class="chev">›</text></view>
+    <view class="row" bindtap="help"><text>💬</text>使用帮助<text class="chev">›</text></view>
+  </view>
+  <text class="note">本地交互原型 · 真实账户与设备服务待接入</text>
+</view>

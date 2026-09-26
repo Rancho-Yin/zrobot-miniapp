@@ -1,0 +1,28 @@
+<view class="page">
+  <view class="tabs">
+    <view class="tab {{tab === 'free' ? 'on' : ''}}" bindtap="switchTab" data-value="free">自由创作</view>
+    <view class="tab {{tab === 'templates' ? 'on' : ''}}" bindtap="switchTab" data-value="templates">模板</view>
+  </view>
+  <view wx:if="{{tab === 'free'}}" class="ideas">
+    <view class="idea" wx:for="{{chips}}" wx:key="name" bindtap="useChip" data-text="{{item.text}}">
+      <text class="idea-name">{{item.name}}</text>
+      <text class="idea-text">{{item.text}}</text>
+    </view>
+  </view>
+  <view wx:else class="tpls">
+    <view class="tpl" wx:for="{{themes}}" wx:key="id" bindtap="useTheme" data-id="{{item.id}}">
+      <image class="tpl-img" src="{{item.img}}" mode="aspectFill"/>
+      <text class="tpl-name">{{item.title}}</text>
+    </view>
+  </view>
+  <view class="composer">
+    <textarea class="input" value="{{input}}" placeholder="描述你想生成的画面…" maxlength="200" bindinput="onInput" auto-height/>
+    <view class="tools">
+      <view class="tool" bindtap="upload">+</view>
+      <text class="cost">生成消耗 {{credits >= 0 ? 2 : 2}} 积分</text>
+      <view class="gap"></view>
+      <view class="tool" bindtap="mic">语音</view>
+      <view class="send {{input ? 'on' : ''}}" bindtap="send">↑</view>
+    </view>
+  </view>
+</view>

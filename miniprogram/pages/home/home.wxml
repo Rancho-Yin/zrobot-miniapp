@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="head"><text class="label">我的智显屏</text><text class="status">● 演示 · 在线</text></view>
+  <view class="stage">
+    <video wx:if="{{cur.type === 'video'}}" class="media" src="{{cur.url}}" object-fit="cover" muted loop autoplay/>
+    <image wx:else class="media" src="{{cur.imageUrl || cur.url}}" mode="aspectFill"/>
+  </view>
+  <view class="meta"><text class="t">{{cur.title || '品牌产品介绍'}}</text><text class="s">演示 · 未连接盒子</text><text class="r">16:9</text></view>
+  <view class="change" bindtap="goLibrary"><text class="ci">⊞</text><text class="ct">更换内容</text><text class="arr">→</text></view>
+  <view class="tools">
+    <view bindtap="goTerminal">现场遥控</view>
+    <view bindtap="goCreate">快速上屏</view>
+    <view bindtap="toggleNarrate">{{narrating ? '结束讲解' : '讲解'}}</view>
+  </view>
+  <view class="chat">
+    <view class="chat-head"><text class="spark">✦</text><text class="ct">屏幕智能助手</text><text class="cr">{{credits}} 积分 · 对话 1/条</text></view>
+    <view wx:if="{{messages.length}}" class="msgs">
+      <view wx:for="{{messages}}" wx:key="index" class="msg {{item.role}}">
+        <view wx:if="{{item.card}}" class="status-card">
+          <view class="sc-head"><text class="sc-t">我的智显屏</text><text class="sc-on">在线</text></view>
+          <view class="sc-title">{{item.card.title}}</view>
+          <view class="sc-rows">
+            <view class="sc-row"><text>播放</text><b>{{item.card.playing ? '播放中' : '已暂停'}}</b></view>
+            <view class="sc-row"><text>讲解</text><b>{{item.card.narrating ? '进行中' : '未开启'}}</b></view>
+            <view class="sc-row"><text>章节</text><b>{{item.card.chapter}} / {{item.card.chapters}}</b></view>
+            <view class="sc-row"><text>音量</text><b>{{item.card.volume}}%</b></view>
+          </view>
+        </view>
+        <view wx:else class="bubble {{item.role}}"><text>{{item.text}}</text></view>
+      </view>
+    </view>
+    <view class="composer">
+      <input value="{{input}}" placeholder="让屏幕做什么…" bindinput="onInput" bindconfirm="onSend" confirm-type="send"/>
+      <view class="mic" bindtap="onMic">语音</view>
+      <view class="send" bindtap="onSend">↑</view>
+    </view>
+  </view>
+</view>

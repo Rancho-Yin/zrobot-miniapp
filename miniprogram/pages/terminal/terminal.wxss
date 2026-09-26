@@ -1,0 +1,12 @@
+.head { display: flex; justify-content: space-between; padding: 4rpx 4rpx 18rpx; }
+.label { font-size: 26rpx; color: #5b6472; }
+.status { font-size: 22rpx; color: #24885d; }
+.stage { background: #101014; color: #fff; border-radius: 24rpx; padding: 160rpx 40rpx; text-align: center; font-size: 34rpx; font-weight: 600; }
+.panel { margin-top: 26rpx; background: #fff; border-radius: 28rpx; padding: 28rpx; }
+.line { display: flex; justify-content: space-between; font-size: 25rpx; color: #5b6472; margin-bottom: 20rpx; }
+.transport { display: flex; align-items: center; justify-content: center; gap: 60rpx; padding: 14rpx 0 26rpx; }
+.transport view { font-size: 44rpx; color: #40454d; }
+.transport .main { width: 110rpx; height: 110rpx; border-radius: 50%; background: #17181c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 48rpx; }
+.vol { display: flex; align-items: center; gap: 16rpx; padding: 10rpx 6rpx 26rpx; }
+.vol slider { flex: 1; }
+.narr { text-align: center; background: #f1ebfc; color: #6d28d9; border-radius: 16rpx; padding: 22rpx; font-size: 27rpx; font-weight: 600; }

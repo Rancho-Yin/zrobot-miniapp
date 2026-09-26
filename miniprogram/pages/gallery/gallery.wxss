@@ -1,0 +1,13 @@
+.page { padding-bottom: 40rpx; }
+.ob-strip { background: #fff; border: 1rpx solid #e7e8ee; border-radius: 999rpx; padding: 12rpx 24rpx; font-size: 23rpx; color: #6d28d9; font-weight: 600; margin-bottom: 20rpx; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40rpx 24rpx; }
+.card { position: relative; }
+.cover-wrap { position: relative; z-index: 1; border-radius: 32rpx; overflow: hidden; background: #e8eaed; box-shadow: 0 2rpx 4rpx rgba(31,41,51,.05); }
+.cover-wrap.stacked::before { content: ''; position: absolute; left: 14rpx; right: 14rpx; top: -16rpx; height: 40rpx; background: #e0e3e9; border-radius: 24rpx; z-index: -1; }
+.cover-wrap.stacked::after { content: ''; position: absolute; left: 28rpx; right: 28rpx; top: -30rpx; height: 40rpx; background: #d5d9e0; border-radius: 24rpx; z-index: -2; }
+.cover { width: 100%; height: 460rpx; display: block; }
+.count { position: absolute; right: 16rpx; top: 16rpx; background: rgba(38,49,58,.7); color: #fff; font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 999rpx; }
+.title { display: block; margin-top: 14rpx; font-size: 26rpx; font-weight: 600; color: #30353c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty { text-align: center; padding: 120rpx 0; color: #8b9199; }
+.brand { width: 120rpx; height: 120rpx; border-radius: 32rpx; margin-bottom: 20rpx; box-shadow: 0 20rpx 48rpx rgba(136,72,245,.18); }
+.fab { position: fixed; right: 36rpx; bottom: 60rpx; width: 112rpx; height: 112rpx; border-radius: 36rpx; background: #8848f5; color: #fff; font-size: 56rpx; display: flex; align-items: center; justify-content: center; box-shadow: 0 28rpx 60rpx rgba(136,72,245,.33); z-index: 9; }

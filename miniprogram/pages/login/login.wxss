@@ -1,0 +1,18 @@
+.page { min-height: 100vh; display: flex; flex-direction: column; background: #f3f5f7; }
+.top { display: flex; flex-direction: column; align-items: center; gap: 16rpx; padding: 120rpx 0 60rpx; }
+.top image { width: 150rpx; height: 150rpx; border-radius: 38rpx; box-shadow: 0 24rpx 56rpx rgba(136,72,245,.2); }
+.name { font-size: 40rpx; font-weight: 700; }
+.sub { font-size: 23rpx; color: #9aa0aa; }
+.sheet { margin-top: auto; background: #fff; border-radius: 40rpx 40rpx 0 0; padding: 36rpx 34rpx 20rpx; }
+.apply { font-size: 24rpx; color: #8b9199; }
+.perm { display: flex; align-items: center; gap: 22rpx; padding: 26rpx 4rpx; border-bottom: 1rpx solid #f0f1f4; }
+.pico { font-size: 34rpx; }
+.pc { flex: 1; }
+.pt { display: block; font-size: 29rpx; font-weight: 600; color: #24272d; }
+.pd { display: block; margin-top: 4rpx; font-size: 22rpx; color: #8b9199; }
+.ptag { font-size: 21rpx; color: #8b9199; background: #f1f2f5; padding: 6rpx 16rpx; border-radius: 999rpx; }
+.agree { display: block; text-align: center; margin: 24rpx 0; font-size: 22rpx; color: #a0a5ad; }
+.btns { display: flex; gap: 20rpx; padding-bottom: 20rpx; }
+.deny,.allow { flex: 1; border-radius: 28rpx; font-size: 30rpx; font-weight: 600; }
+.deny { background: #f1f2f5; color: #5b6472; }
+.allow { background: #07c160; color: #fff; }

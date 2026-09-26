@@ -1,0 +1,18 @@
+<view class="page">
+  <view wx:if="{{obText}}" class="ob-strip">{{obText}}</view>
+  <view class="sec-title"><text>我的创作</text></view>
+  <view class="grid" wx:if="{{works.length}}">
+    <view class="card" wx:for="{{works}}" wx:key="id" bindtap="openWork" data-id="{{item.id}}">
+      <view class="cover-wrap {{item.versions > 1 ? 'stacked' : ''}}">
+        <image class="cover" src="{{item.cover}}" mode="aspectFill"/>
+        <view wx:if="{{item.versions > 1}}" class="count">{{item.versions}} 个版本</view>
+      </view>
+      <text class="title">{{item.title}}</text>
+    </view>
+  </view>
+  <view wx:else class="empty">
+    <image class="brand" src="/assets/logo.png"/>
+    <text>还没有作品，点右下角 + 开始创作</text>
+  </view>
+  <view class="fab" bindtap="goCreate">+</view>
+</view>

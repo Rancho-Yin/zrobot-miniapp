@@ -1,0 +1,17 @@
+.toolbar { display: flex; align-items: center; gap: 16rpx; margin-bottom: 22rpx; }
+.search { flex: 1; display: flex; align-items: center; gap: 10rpx; background: #e9ebef; border-radius: 20rpx; padding: 0 22rpx; height: 76rpx; }
+.search input { flex: 1; font-size: 27rpx; }
+.up { font-size: 34rpx; color: #565d66; padding: 0 10rpx; }
+.filters { display: flex; gap: 34rpx; margin-bottom: 26rpx; }
+.f { font-size: 28rpx; color: #9aa0aa; padding-bottom: 8rpx; }
+.f.on { color: #24272d; font-weight: 700; border-bottom: 4rpx solid #6c4ce8; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34rpx 24rpx; }
+.cover-wrap { position: relative; border-radius: 32rpx; overflow: hidden; background: #e8eaed; }
+.cover { width: 100%; height: 380rpx; display: block; }
+.tag { position: absolute; left: 16rpx; bottom: 14rpx; background: rgba(38,49,58,.75); color: #fff; font-size: 20rpx; padding: 4rpx 14rpx; border-radius: 10rpx; }
+.title { display: block; margin-top: 12rpx; font-size: 26rpx; font-weight: 600; color: #30353c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meta { display: block; margin-top: 4rpx; font-size: 22rpx; color: #a4aab2; }
+.empty { text-align: center; padding: 140rpx 0; color: #8b9199; }
+.brand { width: 120rpx; height: 120rpx; border-radius: 32rpx; margin-bottom: 20rpx; }
+.snackbar { position: fixed; left: 24rpx; right: 24rpx; bottom: 60rpx; background: #26262b; color: #fff; border-radius: 16rpx; padding: 22rpx 28rpx; display: flex; justify-content: space-between; font-size: 25rpx; z-index: 99; }
+.snackbar .undo { color: #a78bfa; font-weight: 700; }
