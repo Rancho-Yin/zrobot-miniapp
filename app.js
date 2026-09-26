@@ -93,7 +93,7 @@ const Onboard = {
       if (!d.done && d.gen && d.prev && d.pub) {
         d.done = true;
         localStorage.setItem('zrobot-onboard', JSON.stringify(d));
-        openSheet(`<div class="success-mark"><i data-lucide="check"></i></div><h2>你已完成第一次上屏</h2><p>生成画面 → 预览调整 → 上屏演示，完整流程已经走通，屏幕正在播放你的内容。</p><div class="button-row single"><button class="primary-button" type="button" data-action="ob-finish">查看屏幕</button></div>`);
+        openSheet(`<div class="success-mark"><i data-lucide="check"></i></div><h2>你已完成第一次上屏</h2><p>生成画面 → 预览调整 → 上屏演示，完整流程已经走通，屏幕正在播放你的内容。</p><div class="ob-next"><small>接下来，你还可以</small><div><i data-lucide="clock"></i><span><strong>定时播放</strong><em>内容到点自动上屏，营业前就位</em></span><b>即将上线</b></div><div><i data-lucide="monitors"></i><span><strong>多屏投放</strong><em>一组屏幕同步播放同一套内容</em></span><b>即将上线</b></div><div><i data-lucide="trending-up"></i><span><strong>播放数据</strong><em>触达次数与停留时长回顾</em></span><b>即将上线</b></div></div><div class="button-row single"><button class="primary-button" type="button" data-action="ob-finish">查看屏幕</button></div>`);
         return true;
       }
     } catch (_) {}
@@ -102,9 +102,10 @@ const Onboard = {
   strip() {
     const d = this.data();
     if (d.done) return '';
+    try { if (sessionStorage.getItem('ob-hide')) return ''; } catch (_) {}
     const steps = [['gen','生成画面'],['prev','预览效果'],['pub','上屏演示']];
     const n = steps.filter(([k]) => d[k]).length;
-    return `<div class="ob-strip"><span class="ob-tag">新手引导 ${n}/3</span>${steps.map(([k, name]) => `<em class="${d[k] ? 'ok' : ''}"><i data-lucide="${d[k] ? 'check' : 'circle'}"></i>${name}</em>`).join('')}</div>`;
+    return `<div class="ob-strip"><span class="ob-tag">新手引导 ${n}/3</span>${steps.map(([k, name]) => `<em class="${d[k] ? 'ok' : ''}"><i data-lucide="${d[k] ? 'check' : 'circle'}"></i>${name}</em>`).join('')}<button class="ob-hide" type="button" data-hub="ob-hide" aria-label="暂时隐藏引导"><i data-lucide="x"></i></button></div>`;
   }
 };
 window.Onboard = Onboard;

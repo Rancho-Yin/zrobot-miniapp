@@ -335,9 +335,23 @@
 .ch-vid { width:100%; height:100%; object-fit:cover; display:block; }
 
 /* Onboarding guide. */
-.ob-strip { display:flex; align-items:center; gap:10px; margin:2px 0 14px; padding:9px 12px; border-radius:12px; background:#f1ebfc; font-size:12px; flex-wrap:wrap; }
-.ob-strip .ob-tag { font-weight:700; color:#6d28d9; }
-.ob-strip em { display:flex; align-items:center; gap:4px; font-style:normal; color:#8b8f97; }
+.ob-strip { display:flex; align-items:center; gap:8px; margin:0 0 12px; padding:6px 6px 6px 12px; border:1px solid #e7e8ee; border-radius:999px; background:#fff; font-size:11.5px; color:#8b8f97; }
+.ob-strip .ob-tag { font-weight:700; color:#8848f5; }
+.ob-strip em { display:flex; align-items:center; gap:4px; font-style:normal; color:#a4aab2; }
 .ob-strip em.ok { color:#6d28d9; font-weight:600; }
-.ob-strip em svg { width:13px; height:13px; }
+.ob-strip em svg { width:12px; height:12px; }
+.ob-strip .ob-hide { margin-left:auto; width:26px; height:26px; border:0; border-radius:50%; background:transparent; color:#9499a1; display:grid; place-items:center; cursor:pointer; }
+.ob-strip .ob-hide:hover { background:#f1f2f5; }
+.ob-strip .ob-hide svg { width:13px; height:13px; }
+
+/* 能力预告（完成弹层内） */
+.ob-next { margin:14px 0 4px; text-align:left; }
+.ob-next>small { color:#8b9199; font-size:11.5px; }
+.ob-next>div { display:flex; align-items:center; gap:11px; padding:10px 2px; border-bottom:1px solid #f0f1f4; }
+.ob-next>div:last-child { border-bottom:0; }
+.ob-next svg { width:17px; color:#8848f5; flex-shrink:0; }
+.ob-next span { flex:1; min-width:0; }
+.ob-next strong { display:block; font-size:13.5px; color:#24272d; }
+.ob-next em { display:block; margin-top:2px; font-style:normal; font-size:11px; color:#8b9199; }
+.ob-next b { font-size:10.5px; color:#a4aab2; font-weight:500; border:1px solid #e3e5ea; padding:2px 8px; border-radius:999px; white-space:nowrap; }
 .ob-steps strong { color:#8848f5; margin-right:4px; }

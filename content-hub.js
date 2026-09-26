@@ -214,6 +214,7 @@ window.ContentHub = (() => {
     if(a==='filter'){filter=b.dataset.value;redraw();}
     if(a==='chip'){const input=document.getElementById('csComposerInput');if(input){input.value=b.dataset.value;input.focus();}}
     if(a==='create-tab'){createTab=b.dataset.value;redraw();}
+    if(a==='ob-hide'){try{sessionStorage.setItem('ob-hide','1')}catch(_){}redraw();}
     if(a==='quick-create')await quickCreate();
     if(a==='voice')ZVoice.toggle(b,document.getElementById('csComposerInput'));
     if(a==='templates')hooks.openSheet(`<div class="ch-sheet-head"><h2>示例模板</h2><button class="ch-icon" data-hub="close" type="button" aria-label="关闭"><i data-lucide="x"></i></button></div>${officialCards(themes)}`);

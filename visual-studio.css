@@ -263,4 +263,9 @@
 .scene-nature .vs-art-world { background-image:url(assets/scene-nature.jpg); }
 .vs-art .vs-art-world::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,#00000030,#0000 40%,#00000066); }
 .vs-art .vs-art-copy { z-index:3; color:#fff; background:#00000045; backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px); border-radius:12px; padding:9px 13px; text-shadow:0 1px 8px #00000045; }
-.vs-art .vs-art-brand { z-index:3; }
+.vs-art .vs-art-brand { z-index:3; color:#fff; text-shadow:0 1px 6px #00000059; }
+
+/* Smart contrast per scene photo: light photo → ink text, dark photo → white text. */
+.scene-gallery .vs-art-copy { color:#20262d; background:#ffffff78; text-shadow:0 1px 5px #ffffffa3; }
+.scene-gallery .vs-art-brand { color:#20262d; text-shadow:0 1px 5px #ffffffa3; }
+.scene-gallery .vs-art-world::after { background:linear-gradient(180deg,#ffffff2e,#0000 45%,#0000001c); }
