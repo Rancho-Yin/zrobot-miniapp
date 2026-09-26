@@ -28,14 +28,14 @@ for(const width of [390,360,1440]){
  assert.equal(await p.locator('.vs-user-request').innerText(),'周末活动：门店精选商品，9月26日至27日');
  await p.screenshot({path:`/tmp/zrobot-records-${width}.png`});
  await p.getByRole('button',{name:'查看版本 1',exact:true}).click();
- await p.getByRole('button',{name:'返回创作中心',exact:true}).click();
+ await p.getByRole('button',{name:'返回创作',exact:true}).click();
  await p.locator('.cs-card').first().waitFor({timeout:2500});
  await p.locator('.cs-card.stacked').first().waitFor({timeout:3000});
  assert.match(await p.locator('.cs-card-title').first().innerText(),/周末活动/);
  await p.screenshot({path:`/tmp/zrobot-feed-versions-${width}.png`});
  await p.locator('.cs-card-img').first().click();
  await p.locator('#vsPrompt').waitFor({timeout:2500});
- await p.getByRole('button',{name:'返回创作中心',exact:true}).click();
+ await p.getByRole('button',{name:'返回创作',exact:true}).click();
  await p.locator('.ch-fab').waitFor({timeout:2500});
  await p.locator('.tab[data-route="library"]').click();assert.equal(await p.locator('.ch-material-grid').count(),0);await p.locator('.ch-cover').first().click();
  await p.getByRole('button',{name:'上屏演示',exact:true}).click();await p.getByRole('button',{name:'查看屏幕',exact:true}).click();
@@ -56,7 +56,7 @@ for(const width of [390,360,1440]){
  assert.equal(await p.evaluate(()=>VisualStudio.getProject().draft.title),'为「产品介绍」生成一张宣传画面');
  await p.waitForFunction(()=>VisualStudio.getProject().versions.length===1);
  assert.equal(await p.locator('.vs-canvas .vs-art-copy').count(),1);
- await p.getByRole('button',{name:'返回创作中心',exact:true}).click();
+ await p.getByRole('button',{name:'返回创作',exact:true}).click();
  await p.locator('.ch-fab').waitFor({timeout:2500});
  await p.locator('.tab[data-route="home"]').click();
  await p.locator('#asInput').waitFor({timeout:2500});

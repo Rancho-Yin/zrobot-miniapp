@@ -6,20 +6,28 @@ const params = new URLSearchParams(location.search);
 const state = {
   route: params.get('login') === 'wechat' ? 'wechat-login' : (['studio','gallery','library','home','profile','project-history','wechat-login'].includes(params.get('view')) ? params.get('view') : 'library'),
   terminalOnline: true,
-  playing: true,
-  narrating: false,
   selectedTemplate: 'product',
   digitalHuman: true,
   title: '让未来，由此展开',
   subtitle: '智显机器人 · AI内容即刻上屏',
   previewSource: 'studio',
-  volume: 62,
-  chapter: 1,
   chapters: 3,
   quickstartStage: 'input',
   quickstartUploaded: false,
   quickstartPrompt: '',
 };
+
+const Store = (() => {
+  const s = {};
+  const subs = new Set();
+  return {
+    get: k => s[k],
+    set(k, v) { const old = s[k]; s[k] = v; subs.forEach(f => f(k, v, old)); return v; },
+    sub(f) { subs.add(f); return () => subs.delete(f); },
+    snapshot() { return { ...s }; }
+  };
+})();
+window.Store = Store;
 
 const escapeHTML = (value = '') => value.replace(/[&<>'"]/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -51,11 +59,16 @@ document.querySelector('.phone').append(orbLayer);
 function renderOrb() {
   orbLayer.hidden = !orbOpen;
   if (!orbOpen) { orbLayer.innerHTML = ''; return; }
-  orbLayer.innerHTML = `<div class="orb"></div><p class="orb-status">${state.narrating ? '讲解模式 · 正在为你讲述画面内容' : '语音模式 · 请说出你的指令'}</p><div class="orb-bar"><input id="orbInput" placeholder="输入或说出指令…" aria-label="输入指令"/><button class="orb-mic" type="button" data-action="orb-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="orb-close" type="button" data-action="orb-close" aria-label="关闭语音模式"><i data-lucide="x"></i></button></div>`;
+  orbLayer.innerHTML = `<div class="orb"></div><p class="orb-status">${orbStatusText()}</p><div class="orb-bar"><input id="orbInput" placeholder="输入或说出指令…" aria-label="输入指令"/><button class="orb-mic" type="button" data-action="orb-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="orb-close" type="button" data-action="orb-close" aria-label="关闭语音模式"><i data-lucide="x"></i></button></div>`;
   lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
 }
-function openOrb() { orbOpen = true; renderOrb(); }
-function closeOrb() { orbOpen = false; renderOrb(); }
+const orbHints = ['试试说：开始讲解', '试试说：暂停播放', '试试说：下一章节', '试试说：音量小一点'];
+let orbHintIdx = 0, orbHintTimer = null;
+function orbStatusText() { return state.narrating ? '讲解模式 · 正在为你讲述画面内容' : orbHints[orbHintIdx % orbHints.length]; }
+function startOrbHints() { stopOrbHints(); orbHintTimer = setInterval(() => { orbHintIdx += 1; const el = document.querySelector('.orb-status'); if (el) el.textContent = orbStatusText(); }, 2600); }
+function stopOrbHints() { if (orbHintTimer) { clearInterval(orbHintTimer); orbHintTimer = null; } }
+function openOrb() { orbOpen = true; renderOrb(); if (!state.narrating) startOrbHints(); }
+function closeOrb() { orbOpen = false; stopOrbHints(); renderOrb(); }
 function assistantAct(t) {
   const has = (...ws) => ws.some(w => t.includes(w));
   if (has('结束讲解', '关闭讲解', '停止讲解')) return { text: '已结束讲解。', card: true, run: () => { state.narrating = false; closeOrb(); render(); } };
@@ -120,7 +133,10 @@ function screenStatus() {
   const pb = ContentHub.getPlayback();
   return { title: pb?.title || state.title, playing: state.playing, narrating: state.narrating, chapter: state.chapter, chapters: state.chapters, volume: state.volume };
 }
-const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分</span></div>${assistantMessages.length ? `<div class="as-feed" id="asFeed">${assistantMessages.map(m => m.card ? `<div class="as-msg ${m.role}">${statusCardHTML(m.card)}</div>` : `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div>` : ''}<div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
+const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分 · 对话 1/条</span></div>${assistantMessages.length ? `<div class="as-feed" id="asFeed">${assistantMessages.map(m => m.card ? `<div class="as-msg ${m.role}">${statusCardHTML(m.card)}</div>` : `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div>` : ''}<div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
+
+Store.set('playing', true); Store.set('narrating', false); Store.set('chapter', 1); Store.set('volume', 62);
+['playing', 'narrating', 'chapter', 'volume'].forEach((k) => Object.defineProperty(state, k, { get: () => Store.get(k), set: v => Store.set(k, v) }));
 
 const preview = (compact = false) => ['home','terminal'].includes(state.route) && ContentHub.getPlayback()
   ? ContentHub.playbackMedia(state.playing)
@@ -336,11 +352,22 @@ function navigate(route) {
   render();
 }
 
-function showToast(message) {
-  toast.textContent = message;
+function hideToast() { toast.hidden = true; window.clearTimeout(showToast.timer); }
+function showToast(message, action) {
+  toast.replaceChildren();
+  const span = document.createElement('span');
+  span.textContent = message;
+  toast.append(span);
+  if (action?.label) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = action.label;
+    btn.addEventListener('click', () => { hideToast(); action.handler?.(); });
+    toast.append(btn);
+  }
   toast.hidden = false;
   window.clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => { toast.hidden = true; }, 1800);
+  showToast.timer = window.setTimeout(hideToast, action ? 5000 : 1800);
 }
 
 function openSheet(content) {
