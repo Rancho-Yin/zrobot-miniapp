@@ -542,6 +542,7 @@ applyTheme();
 VisualStudio.init({render,navigate,toast:showToast,openSheet,closeSheet,changed:()=>ContentHub.queueSave(),
   spend:(n,reason)=>Credits.spend(n,reason),
   onboard:(step)=>Onboard.mark(step),
+  refund:(n)=>{Credits.set(Credits.get()+n);showToast(`AI 未连接 · 已退还 ${n} 积分`);},
   preview(){state.previewSource='visual';navigate('preview');},
   async published(version){await ContentHub.setStudioPlayback(version);state.title=version.data.title;state.subtitle=version.data.subtitle;state.digitalHuman=false;state.narrating=false;state.playing=true;render();},
   cleared(){ContentHub.clearPlayback().catch(()=>showToast('播放状态未保存，请刷新重试'));}

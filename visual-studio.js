@@ -8,7 +8,7 @@ window.VisualStudio = (() => {
     style: [['quiet','简约','克制的配色'],['tech','科技','深色与光感'],['warm','温暖','柔和的暖白'],['bold','鲜明','醒目的品牌色']],
     motion: [['none','静态画面','保持当前画面'],['push','缓慢推进','轻缓的整体运镜'],['focus','产品聚焦','产品轻微靠近'],['reveal','文字浮现','标题与卖点依次呈现']]
   };
-  const base = { asset: sample, assetName: '咖啡机示例', scenario:'free', showText:true, dateText:'', purpose:'product', scene:'gallery', style:'quiet', title:'每一杯，都刚刚好', subtitle:'智能研磨 · 静享醇香', price:'', prompt:'', motion:'none' };
+  const base = { asset: sample, assetName: '咖啡机示例', scenario:'free', showText:true, dateText:'', purpose:'product', scene:'gallery', style:'quiet', title:'每一杯，都刚刚好', subtitle:'智能研磨 · 静享醇香', price:'', prompt:'', motion:'none', imageUrl:'' };
   let draft = {...base}, versions = [], selected = null, pending = null, published = null;
   let projectId = `project-${Date.now()}`;
   let panel = null, busy = false, issue = '', playing = false, job = 0, dirty = false, saved = true, pendingChanges=[];
@@ -26,6 +26,7 @@ window.VisualStudio = (() => {
     if(['product','event','welcome','art','free'].includes(value.scenario))d.scenario=value.scenario;
     d.showText=value.showText!==false;
     if(safeAsset(value.asset))d.asset=value.asset;
+    if(typeof value.imageUrl==='string'&&/^(data:image\/(png|jpeg|webp);base64,|https:\/\/)/.test(value.imageUrl))d.imageUrl=value.imageUrl;
     return d;
   }
   try {
@@ -54,6 +55,10 @@ window.VisualStudio = (() => {
   function change(field,value) {if(draft[field]===value)return;draft[field]=value;markChange(`${({style:'风格',scene:'场景',purpose:'布局',motion:'动效'})[field]||field}：${label(field,value)}`);playing=false;persist();repaint();}
   const current = () => versions.find(v=>v.id===selected);
   function artwork(data=draft, animate=false, mini=false) {
+    if(data.imageUrl){
+      const extras=mini?'':`<div class="vs-art-brand"><img src="assets/zrobot-mark.png" alt=""/> ZROBOT</div>${data.showText!==false?`<div class="vs-art-copy"><strong>${esc(data.title)}</strong>${data.subtitle?`<span>${esc(data.subtitle)}</span>`:''}${data.price?`<b>${esc(data.price)}</b>`:''}${data.dateText?`<span>${esc(data.dateText)}</span>`:''}</div>`:''}`;
+      return `<div class="vs-art vs-art-real" role="img" aria-label="${esc(data.title)}"><img src="${esc(data.imageUrl)}" alt=""/>${extras}</div>`;
+    }
     if(data.showText===false)return `<div class="vs-art vs-art-pure style-${data.style}" role="img" aria-label="${esc(data.title)}"><img src="${esc(data.asset)}" alt="${esc(data.assetName)}"/></div>`;
     return `<div class="vs-art purpose-${data.purpose} scene-${data.scene} style-${data.style} motion-${animate?data.motion:'none'} ${mini?'vs-mini':''}" role="img" aria-label="${esc(data.title)}，${esc(label('scene',data.scene))}，${esc(label('style',data.style))}">
       <div class="vs-art-world"><div class="vs-room"></div><div class="vs-plinth"></div><img class="vs-product" src="${esc(data.asset)}" alt="${esc(data.assetName)}"/><div class="vs-art-brand"><img src="assets/zrobot-mark.png" alt=""/> ZROBOT</div><div class="vs-art-copy"><strong>${esc(data.title)}</strong><span>${esc(data.subtitle)}</span>${data.price?`<b>${esc(data.price)}</b>`:''}${data.dateText?`<span>${esc(data.dateText)}</span>`:''}</div></div></div>`;
@@ -83,12 +88,12 @@ window.VisualStudio = (() => {
       <header class="vs-topbar"><button class="vs-icon vs-round" type="button" data-route="gallery" aria-label="返回创作"><i data-lucide="${hasResult?'chevron-left':'x'}"></i></button><h1 class="vs-sr-only">${hasResult?'创作':'创作'}</h1><button class="vs-demo-badge" type="button" data-vs="panel" data-panel="about" aria-label="演示模式，查看说明">演示</button>${hasResult?`<div class="vs-top-actions"><button class="vs-done" data-vs="preview" type="button" ${busy?'disabled':''}>上屏<i data-lucide="arrow-up-right"></i></button><button class="vs-icon vs-round" type="button" data-vs="panel" data-panel="more" aria-label="更多作品选项"><i data-lucide="ellipsis"></i></button></div>`:''}</header>
       ${hasResult?`<div class="vs-scroll">
         <div class="vs-result-meta"><button type="button" data-vs="panel" data-panel="style"><span class="vs-style-dot style-${draft.style}"></span>${CreationScenarios.name(draft.scenario)}</button><span>16:9</span></div>
-        <div class="vs-canvas">${artwork(draft,playing)}<span class="vs-version-badge">v${version?.number||1} / ${versions.length}${dirty?' · 已调整':''}</span>${versions.length>1?`<button class="vs-canvas-arrow prev" type="button" data-vs="previous" aria-label="上一个版本"><i data-lucide="chevron-left"></i></button><button class="vs-canvas-arrow next" type="button" data-vs="next" aria-label="下一个版本"><i data-lucide="chevron-right"></i></button>`:''}${busy?'<div class="vs-working" role="status"><span></span>正在组合演示画面…</div>':''}</div>
+        <div class="vs-canvas">${artwork(draft,playing)}<span class="vs-version-badge">v${version?.number||1} / ${versions.length}${dirty?' · 已调整':''}</span>${versions.length>1?`<button class="vs-canvas-arrow prev" type="button" data-vs="previous" aria-label="上一个版本"><i data-lucide="chevron-left"></i></button><button class="vs-canvas-arrow next" type="button" data-vs="next" aria-label="下一个版本"><i data-lucide="chevron-right"></i></button>`:''}${busy?`<div class="vs-working" role="status"><span></span>${realBusy?'正在生成真实画面，约 20~40 秒…':'正在组合演示画面…'}</div>`:''}</div>
         <div class="vs-quick-actions"><button type="button" data-vs="panel" data-panel="text"><i data-lucide="square-pen"></i>${draft.showText?'改信息':'改名称'}</button><button type="button" data-vs="panel" data-panel="asset"><i data-lucide="image"></i>换图片</button>${dirty?'<button type="button" data-vs="save-version">保存版本</button>':''}</div>
         <div class="vs-filmstrip" aria-label="版本历史">${versions.length>1?versions.map(v=>`<button type="button" data-vs="restore" data-id="${v.id}" aria-label="查看版本 ${v.number}" aria-pressed="${selected===v.id}">${artwork(v.data,false)}<span>v${v.number}</span></button>`).join(''):''}</div>
         <details class="vs-records"><summary>创作记录<span>${versions.length}</span></summary>${[...versions].reverse().map(v=>`<article><header><strong>版本 ${v.number}</strong>${v.createdAt?`<time>${new Date(v.createdAt).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</time>`:''}</header>${v.request?`<small>你</small><p class="vs-user-request">${esc(v.request)}</p>`:''}${v.changes?.length?`<small>修改记录</small><p>${v.changes.map(esc).join('；')}</p>`:''}<p class="vs-record-result">${v.request?'要求已记录 · AI处理为演示':v.changes?.length?'已保存画面调整':`系统记录 · ${esc(v.note||'已生成版本')}`}</p></article>`).join('')}</details>
         ${!saved?'<p class="vs-error" role="alert">浏览器存储空间不足，当前调整未保存。</p>':''}
-      </div><div class="vs-result-bottom"><div class="vs-followup">${prompt}${mic}${send}</div></div>`:`<div class="vs-new-body">${draft.scenario!=='free'?`<div class="vs-brief"><span>${CreationScenarios.name(draft.scenario)}</span><button type="button" data-vs="panel" data-panel="text">${esc(draft.title)}<i data-lucide="square-pen"></i></button></div>`:''}<div class="vs-prompt-card">${prompt}<div class="vs-ingredients"><button type="button" data-vs="panel" data-panel="asset" aria-label="更换主体图片：${esc(draft.assetName)}"><img src="${esc(draft.asset)}" alt=""/><span>${draft.asset.startsWith('assets/')?'示例':'已添加'}</span></button></div><div class="vs-input-tools"><div>${[['asset','image','图片'],...(draft.showText?[['scene','sparkles','场景'],['purpose','layout-grid','布局']]:[])].map(([p,icon,name])=>`<button type="button" data-vs="panel" data-panel="${p}"><i data-lucide="${icon}"></i>${name}</button>`).join('')}</div>${mic}${send}</div>${busy?'<div class="vs-creating" role="status">生成中…</div>':''}</div><div class="vs-style-picker" role="group" aria-label="风格"><div>${choices.style.map(([id,name])=>`<button type="button" data-vs="choose" data-field="style" data-value="${id}" aria-pressed="${draft.style===id}">${name}</button>`).join('')}</div></div></div>`}
+      </div><div class="vs-result-bottom"><div class="vs-followup">${prompt}${mic}${send}</div></div>`:`<div class="vs-new-body">${draft.scenario!=='free'?`<div class="vs-brief"><span>${CreationScenarios.name(draft.scenario)}</span><button type="button" data-vs="panel" data-panel="text">${esc(draft.title)}<i data-lucide="square-pen"></i></button></div>`:''}<div class="vs-prompt-card">${prompt}<div class="vs-ingredients"><button type="button" data-vs="panel" data-panel="asset" aria-label="更换主体图片：${esc(draft.assetName)}"><img src="${esc(draft.asset)}" alt=""/><span>${draft.asset.startsWith('assets/')?'示例':'已添加'}</span></button></div><div class="vs-input-tools"><div>${[['asset','image','图片'],...(draft.showText?[['scene','sparkles','场景'],['purpose','layout-grid','布局']]:[])].map(([p,icon,name])=>`<button type="button" data-vs="panel" data-panel="${p}"><i data-lucide="${icon}"></i>${name}</button>`).join('')}</div>${mic}${send}</div>${busy?`<div class="vs-creating" role="status">${realBusy?'真实生成中，约 20~40 秒…':'生成中…'}</div>`:''}</div><div class="vs-style-picker" role="group" aria-label="风格"><div>${choices.style.map(([id,name])=>`<button type="button" data-vs="choose" data-field="style" data-value="${id}" aria-pressed="${draft.style===id}">${name}</button>`).join('')}</div></div></div>`}
       ${issue?`<div class="vs-inline-error" role="alert">${esc(issue)}<button type="button" data-vs="retry">重试</button></div>`:''}${tray()}
     </section>`;
   }
@@ -97,20 +102,38 @@ window.VisualStudio = (() => {
     const v={id:`v-${Date.now()}-${number}`,projectId,number,data:copy(data),note,parentId:selected,request:data.prompt?.trim()||'',changes:[...pendingChanges],createdAt:Date.now()};
     versions.push(v);selected=v.id;dirty=false;pendingChanges=[];persist();return v;
   }
+  const API_URL='https://zrobot-miniapp.vercel.app/api/generate';
+  let realBusy=false;
+  function shrink(dataUrl){return new Promise(res=>{const img=new Image();img.onload=()=>{try{const w=Math.min(1024,img.width),h=Math.max(1,Math.round(img.height*w/img.width));const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',0.72));}catch(_){res(dataUrl);}};img.onerror=()=>res(dataUrl);img.src=dataUrl;});}
+  function realGenerate(prompt){return fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,size:'1024x1024'})}).then(async r=>{const j=await r.json().catch(()=>null);return j&&j.imageUrl?j.imageUrl:null;}).catch(()=>null);}
   function generate() {
     if(busy)return;
     if(hooks.spend&&!hooks.spend(2,'生成画面'))return;
     if(!draft.title.trim()){issue='请先填写主标题。';panel='text';repaint();return;}
     busy=true;issue='';playing=false;panel=null;
     const snapshot=copy(draft), token=++job;
-    repaint();
-    setTimeout(()=>{
-      if(token!==job)return;
-      addVersion(snapshot,snapshot.prompt||`${label('scene',snapshot.scene)} · ${label('style',snapshot.style)}`);
-      busy=false;dirty=JSON.stringify(snapshot)!==JSON.stringify(draft);draft.prompt='';persist();repaint();
+    let noapi=false; try{noapi=localStorage.getItem('zrobot-noapi')==='1';}catch(_){}
+    const promptText=[snapshot.title,snapshot.subtitle,snapshot.prompt].filter(Boolean).join('。');
+    const finish=(data,note,real)=>{ if(token!==job)return;
+      addVersion(data,note);
+      busy=false;realBusy=false;dirty=JSON.stringify(snapshot)!==JSON.stringify(draft);draft.prompt='';persist();repaint();
       hooks.onboard?.('gen');
-      hooks.toast?.('已生成演示版本');
-    },900);
+      hooks.toast?.(real?'已生成真实画面':'已生成演示版本');
+    };
+    const simulate=(fallback)=>setTimeout(()=>{ if(token!==job)return;
+      addVersion(snapshot,snapshot.prompt||`${label('scene',snapshot.scene)} · ${label('style',snapshot.style)}`);
+      busy=false;realBusy=false;dirty=JSON.stringify(snapshot)!==JSON.stringify(draft);draft.prompt='';persist();repaint();
+      if(fallback)hooks.refund?.(2,'生成画面');
+      hooks.onboard?.('gen');
+      hooks.toast?.(fallback?'AI 服务未连接，已改用演示画面并退回积分':'已生成演示版本');
+    },600);
+    repaint();
+    if(noapi){simulate(false);return;}
+    realBusy=true;repaint();
+    realGenerate(promptText).then(url=>{ if(token!==job)return;
+      if(!url){simulate(true);return;}
+      shrink(url).then(small=>{ if(token!==job)return; const d=copy(snapshot); d.imageUrl=small; finish(d,snapshot.prompt||snapshot.title,true); });
+    }).catch(()=>{ if(token!==job)return; simulate(true); });
   }
   function restore(id) {
     const v=versions.find(x=>x.id===id);if(!v)return;

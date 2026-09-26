@@ -273,3 +273,9 @@
 /* Dark mode: studio base surfaces. */
 .phone[data-theme=dark] .vs-studio { background:#101014; }
 .phone[data-theme=dark] .vs-topbar { background:#101014; }
+
+/* Real AI-generated image artworks. */
+.vs-art.vs-art-real { background:#101014; }
+.vs-art.vs-art-real img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.vs-art.vs-art-real .vs-art-copy { color:#fff; background:#00000059; text-shadow:0 1px 8px #00000059; }
+.vs-art.vs-art-real .vs-art-brand { color:#fff; text-shadow:0 1px 6px #00000080; }

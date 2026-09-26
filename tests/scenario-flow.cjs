@@ -4,6 +4,7 @@ const url=process.env.PROTOTYPE_URL||'http://127.0.0.1:4174/miniapp-prototype/in
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});try{
 for(const width of [390,360,1440]){
  const p=await browser.newPage({viewport:{width,height:width===360?740:900}}),errors=[];p.on('pageerror',e=>errors.push(e.message));global.failPage=p;
+ await p.addInitScript(()=>{try{localStorage.setItem('zrobot-noapi','1')}catch(_){}});
  await p.goto(url+'?view=gallery');
  await p.locator('.ch-fab').click();
  await p.locator('#csComposerInput').waitFor({timeout:2500});
