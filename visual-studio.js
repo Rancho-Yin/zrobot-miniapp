@@ -105,7 +105,13 @@ window.VisualStudio = (() => {
   const API_URL='https://zrobot-miniapp.vercel.app/api/generate';
   let realBusy=false;
   function shrink(dataUrl){return new Promise(res=>{const img=new Image();img.onload=()=>{try{const w=Math.min(1024,img.width),h=Math.max(1,Math.round(img.height*w/img.width));const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',0.72));}catch(_){res(dataUrl);}};img.onerror=()=>res(dataUrl);img.src=dataUrl;});}
-  function realGenerate(prompt){return fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,size:'1024x1024'})}).then(async r=>{const j=await r.json().catch(()=>null);return j&&j.imageUrl?j.imageUrl:null;}).catch(()=>null);}
+  function realGenerate(prompt){
+    const ctrl=new AbortController();
+    const killer=setTimeout(()=>ctrl.abort(),45000);
+    return fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,size:'1024x1024'}),signal:ctrl.signal})
+      .then(async r=>{clearTimeout(killer);const j=await r.json().catch(()=>null);return j&&j.imageUrl?j.imageUrl:null;})
+      .catch(()=>{clearTimeout(killer);return null;});
+  }
   function generate() {
     if(busy)return;
     if(hooks.spend&&!hooks.spend(2,'生成画面'))return;
