@@ -7,7 +7,7 @@ for(const width of [390,360,1440]){
  await p.goto(url+'?view=gallery');
  await p.locator('.ch-fab').click();
  await p.locator('#csComposerInput').waitFor({timeout:2500});
- await p.locator('[data-hub="create-tab"][data-value="ideas"]').click();
+ await p.locator('[data-hub="create-tab"][data-value="free"]').click();
  await p.locator('[data-hub="chip"]').first().click();
  assert.equal(await p.locator('#csComposerInput').inputValue(),'介绍这款产品的核心卖点与使用场景');
  await p.screenshot({path:`/tmp/zrobot-composer-${width}.png`});

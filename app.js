@@ -41,9 +41,7 @@ const Credits = {
   }
 };
 
-const assistantMessages = [
-  { role: 'assistant', text: '你好，我是屏幕智能助手。可以直接让我控制屏幕：开始讲解、暂停播放、切换章节、调节音量，或查看积分。' }
-];
+const assistantMessages = [];
 let orbOpen = false;
 const orbLayer = document.createElement('div');
 orbLayer.className = 'orb-layer';
@@ -122,7 +120,7 @@ function screenStatus() {
   const pb = ContentHub.getPlayback();
   return { title: pb?.title || state.title, playing: state.playing, narrating: state.narrating, chapter: state.chapter, chapters: state.chapters, volume: state.volume };
 }
-const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分</span></div><div class="as-feed" id="asFeed">${assistantMessages.map(m => m.card ? `<div class="as-msg ${m.role}">${statusCardHTML(m.card)}</div>` : `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div><div class="as-chips">${['开始讲解', '暂停播放', '下一章节', '查看积分'].map(c => `<button type="button" data-action="as-chip" data-value="${c}">${c}</button>`).join('')}</div><div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
+const assistantChatBlock = () => `<div class="sc-chat"><div class="sc-chat-head"><i data-lucide="sparkles"></i><strong>屏幕智能助手</strong><span>${Credits.get()} 积分</span></div>${assistantMessages.length ? `<div class="as-feed" id="asFeed">${assistantMessages.map(m => m.card ? `<div class="as-msg ${m.role}">${statusCardHTML(m.card)}</div>` : `<div class="as-msg ${m.role}"><p>${escapeHTML(m.text)}</p></div>`).join('')}</div>` : ''}<div class="sc-chat-actions"><button type="button" data-action="chat-go" data-tab="free"><i data-lucide="wand-sparkles"></i>自由创作</button><button type="button" data-action="chat-go" data-tab="templates"><i data-lucide="layout-template"></i>模板</button></div><div class="as-composer"><input id="asInput" placeholder="让屏幕做什么…" aria-label="让屏幕做什么"/><button class="as-mic" type="button" data-action="as-voice" aria-label="语音输入"><i data-lucide="mic"></i></button><button class="as-send" type="button" data-action="as-send" aria-label="发送"><i data-lucide="arrow-up"></i></button></div></div>`;
 
 const preview = (compact = false) => ['home','terminal'].includes(state.route) && ContentHub.getPlayback()
   ? ContentHub.playbackMedia(state.playing)
@@ -481,6 +479,7 @@ document.addEventListener('click', (event) => {
   if (action === 'as-chip') handleAssistant(actionTarget.dataset.value);
   if (action === 'as-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('asInput'));
   if (action === 'orb-close') { closeOrb(); render(); }
+  if (action === 'chat-go') { ContentHub.setTab?.(actionTarget.dataset.tab === 'templates' ? 'templates' : 'free'); navigate('create'); }
   if (action === 'ob-start') { closeSheet(); navigate('create'); }
   if (action === 'ob-finish') { closeSheet(); navigate('home'); }
   if (action === 'orb-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('orbInput'));

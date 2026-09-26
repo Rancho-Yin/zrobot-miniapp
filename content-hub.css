@@ -418,3 +418,20 @@
 .phone[data-theme=dark] .sheet h2 { color:#eceef2; }
 .phone[data-theme=dark] .sheet p { color:#9aa0aa; }
 .phone[data-theme=dark] .secondary-button { background:#23252b; color:#e7e8eb; }
+
+/* ChatGPT-style multi-line composer on the create page. */
+.cs-composer-box { background:#e9ebef; border-radius:26px; padding:12px 12px 10px; box-shadow:0 8px 22px #24272d14; }
+#csComposerInput { display:block; width:100%; min-height:46px; max-height:132px; border:0; background:transparent; outline:0; resize:none; font-size:14.5px; line-height:1.5; color:#24272d; padding:2px 6px; font-family:inherit; box-sizing:border-box; }
+#csComposerInput::placeholder { color:#9298a1; }
+.cs-composer-tools { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.cs-tools-gap { flex:1; }
+.phone[data-theme=dark] .cs-composer-box { background:#23252b; }
+.phone[data-theme=dark] #csComposerInput { color:#e7e8eb; }
+
+/* Home chat window: free-create / templates entries. */
+.sc-chat-actions { display:flex; gap:8px; margin:0 0 10px; }
+.sc-chat-actions button { flex:1; display:flex; align-items:center; justify-content:center; gap:7px; min-height:44px; border:1px solid #e3e5ea; border-radius:14px; background:#fff; color:#3d434b; font-size:13px; font-weight:550; cursor:pointer; transition:background var(--t-fast) ease; }
+.sc-chat-actions button:hover { background:#f4f5f8; }
+.sc-chat-actions button svg { width:16px; height:16px; color:#8848f5; }
+.phone[data-theme=dark] .sc-chat-actions button { background:#1a1b20; border-color:#2a2c33; color:#cfd2d8; }
+.phone[data-theme=dark] .sc-chat-actions button svg { color:#a78bfa; }
