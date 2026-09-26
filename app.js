@@ -178,8 +178,6 @@ const homeView = () => `<div class="home-wrap">
     <button type="button" data-action="start-narration"><i data-lucide="bot"></i><span><strong>${state.narrating ? '结束讲解' : '讲解'}</strong></span></button>
   </div>
 
-  <div class="section-title"><h2>最近内容</h2><button type="button" data-route="library">查看全部</button></div>
-  ${ContentHub.recent()}
   ${assistantChatBlock()}</div>`;
 
 const quickstartProgress = () => `
