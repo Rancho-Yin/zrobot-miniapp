@@ -2,16 +2,12 @@ const store = require('../../utils/store');
 const ai = require('../../utils/ai');
 const CFG = require('../../utils/config');
 Page({
-  data: { tab: 'free', input: '', credits: 0, themes: [], chips: [], busy: false },
+  data: { showTpl: false, input: '', credits: 0, themes: [], busy: false },
   onLoad() {
-    this.setData({
-      credits: store.getCredits(),
-      themes: CFG.THEMES.map(t => Object.assign({}, t, { img: t.img })),
-      chips: CFG.CHIPS.map(c => ({ name: c[0], text: c[1] }))
-    });
+    this.setData({ credits: store.getCredits(), themes: CFG.THEMES.map(t => Object.assign({}, t, { img: t.img })) });
   },
   onShow() { this.setData({ credits: store.getCredits() }); },
-  switchTab(e) { this.setData({ tab: e.currentTarget.dataset.value }); },
+  toggleTpl() { this.setData({ showTpl: !this.data.showTpl }); },
   onInput(e) { this.setData({ input: e.detail.value }); },
   useChip(e) { this.setData({ input: e.currentTarget.dataset.text }); },
   useTheme(e) {

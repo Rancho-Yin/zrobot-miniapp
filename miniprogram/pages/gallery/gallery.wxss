@@ -11,3 +11,11 @@
 .empty { text-align: center; padding: 120rpx 0; color: #8b9199; }
 .brand { width: 120rpx; height: 120rpx; border-radius: 32rpx; margin-bottom: 20rpx; box-shadow: 0 20rpx 48rpx rgba(136,72,245,.18); }
 .fab { position: fixed; right: 36rpx; bottom: 60rpx; width: 112rpx; height: 112rpx; border-radius: 36rpx; background: #8848f5; color: #fff; font-size: 56rpx; display: flex; align-items: center; justify-content: center; box-shadow: 0 28rpx 60rpx rgba(136,72,245,.33); z-index: 9; }
+
+.grid { columns: 2; column-gap: 24rpx; }
+.card { break-inside: avoid; margin: 0 0 24rpx; display: inline-block; width: 100%; }
+.cover { width: 100%; display: block; }
+.count { right: 16rpx; top: 16rpx; }
+.style { position: absolute; left: 16rpx; bottom: 16rpx; background: rgba(38,49,58,.75); color: #fff; font-size: 22rpx; padding: 4rpx 18rpx; border-radius: 999rpx; }
+.title { display: none; }
+.sec-title .count { font-size: 24rpx; color: #a4aab2; font-weight: 400; }

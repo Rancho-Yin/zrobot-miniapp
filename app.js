@@ -121,7 +121,7 @@ const Onboard = {
     try { if (sessionStorage.getItem('ob-hide')) return ''; } catch (_) {}
     const steps = [['gen','生成画面'],['prev','预览效果'],['pub','上屏演示']];
     const n = steps.filter(([k]) => d[k]).length;
-    return `<div class="ob-strip"><span class="ob-tag">新手引导 ${n}/3</span>${steps.map(([k, name]) => `<em class="${d[k] ? 'ok' : ''}"><i data-lucide="${d[k] ? 'check' : 'circle'}"></i>${name}</em>`).join('')}<button class="ob-hide" type="button" data-hub="ob-hide" aria-label="暂时隐藏引导"><i data-lucide="x"></i></button></div>`;
+    return `<div class="ob-strip"><span class="ob-tag">${n}/3</span>${steps.map(([k]) => `<em class="${d[k] ? 'ok' : ''}" aria-label="${d[k] ? '已完成' : '未完成'}"></em>`).join('')}<button class="ob-hide" type="button" data-hub="ob-hide" aria-label="暂时隐藏引导"><i data-lucide="x"></i></button></div>`;
   }
 };
 window.Onboard = Onboard;
@@ -540,7 +540,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 modalLayer.addEventListener('click', (event) => { if (event.target === modalLayer) closeSheet(); });
-document.getElementById('profileButton').addEventListener('click', () => navigate('profile'));
+
 function applyTheme() {
   let t = null;
   try { t = localStorage.getItem('zrobot-theme'); } catch (_) {}
@@ -556,7 +556,6 @@ function toggleTheme() {
   lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
   showToast(next === 'dark' ? '已切换深色模式' : '已切换浅色模式');
 }
-document.getElementById('themeButton').addEventListener('click', toggleTheme);
 applyTheme();
 
 VisualStudio.init({render,navigate,toast:showToast,openSheet,closeSheet,changed:()=>ContentHub.queueSave(),

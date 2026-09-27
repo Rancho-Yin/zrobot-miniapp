@@ -25,10 +25,10 @@ await step('02 允许授权（手机号+头像昵称）→ 极简三步引导',a
   await p.locator('.ob-intro').waitFor({timeout:5000});
   assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('zrobot-user')).name),'微信用户');
 });
-await step('03 开始体验 → 生成界面（自由创作标签 + 引导条 0/3）',async()=>{
+await step('03 开始体验 → 生成界面（纯净 Hero + 引导条 0/3）',async()=>{
   await p.getByRole('button',{name:'开始体验',exact:true}).click();
-  await p.locator('.cs-tabs').waitFor({timeout:3000});
-  assert.match(await p.locator('.cs-tabs button[aria-pressed=true]').innerText(),/自由创作/);
+  await p.locator('.cs-hero-title').waitFor({timeout:3000});
+  assert.match(await p.locator('.cs-hero-title').innerText(),/想创作什么/);
   assert.match(await p.locator('.ob-strip').innerText(),/0\/3/);
 });
 await step('04 一句话生成（模拟）→ 版本 1 → 扣 2 积分 → 引导 1/3',async()=>{
@@ -129,12 +129,12 @@ await step('12 删除 → 撤销恢复 → 再删不撤销 → 消失',async()=>
   await p.waitForTimeout(5500);
   assert.equal(await p.locator('.ch-card').count(),before-1);
 });
-await step('13 深色模式：切换 + 刷新持久',async()=>{
-  await p.locator('#themeButton').click();
-  assert.equal(await p.evaluate(()=>document.querySelector('.phone').getAttribute('data-theme')),'dark');
+await step('13 深色模式：跟随设置 + 刷新持久',async()=>{
+  await p.evaluate(()=>localStorage.setItem('zrobot-theme','dark'));
   await p.reload();await p.waitForTimeout(500);
   assert.equal(await p.evaluate(()=>document.querySelector('.phone').getAttribute('data-theme')),'dark');
-  await p.locator('#themeButton').click();
+  await p.evaluate(()=>localStorage.setItem('zrobot-theme','light'));
+  await p.reload();await p.waitForTimeout(300);
   assert.equal(await p.evaluate(()=>document.querySelector('.phone').getAttribute('data-theme')),'light');
 });
 await step('14 无横向溢出、无页面错误',async()=>{

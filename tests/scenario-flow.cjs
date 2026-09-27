@@ -7,10 +7,8 @@ for(const width of [390,360,1440]){
  await p.addInitScript(()=>{try{localStorage.setItem('zrobot-noapi','1')}catch(_){}});
  await p.goto(url+'?view=gallery');
  await p.locator('.ch-fab').click();
- await p.locator('#csComposerInput').waitFor({timeout:2500});
- await p.locator('[data-hub="create-tab"][data-value="free"]').click();
- await p.locator('[data-hub="chip"]').first().click();
- assert.equal(await p.locator('#csComposerInput').inputValue(),'介绍这款产品的核心卖点与使用场景');
+ await p.locator('.cs-hero-title').waitFor({timeout:2500});
+ assert.match(await p.locator('.cs-hero-title').innerText(),/想创作什么/);
  await p.screenshot({path:`/tmp/zrobot-composer-${width}.png`});
  await p.locator('#csComposerInput').fill('周末活动：门店精选商品，9月26日至27日');
  await p.locator('[data-hub="quick-create"]').click();
@@ -32,7 +30,7 @@ for(const width of [390,360,1440]){
  await p.getByRole('button',{name:'返回创作',exact:true}).click();
  await p.locator('.cs-card').first().waitFor({timeout:2500});
  await p.locator('.cs-card.stacked').first().waitFor({timeout:3000});
- assert.match(await p.locator('.cs-card-title').first().innerText(),/周末活动/);
+ assert.match(await p.locator('.cs-card.stacked .cs-card-img').first().getAttribute('aria-label'),/周末活动/);
  await p.screenshot({path:`/tmp/zrobot-feed-versions-${width}.png`});
  await p.locator('.cs-card-img').first().click();
  await p.locator('#vsPrompt').waitFor({timeout:2500});
@@ -47,7 +45,7 @@ for(const width of [390,360,1440]){
  await p.getByRole('button',{name:'只看收藏',exact:true}).click();assert.equal(await p.locator('.ch-card').count(),1);
  await p.locator('.tab[data-route="gallery"]').click();
  await p.locator('.ch-fab').click();
- await p.locator('[data-hub="create-tab"][data-value="templates"]').click();
+ await p.getByRole('button',{name:'模板',exact:true}).click();
  await p.locator('.cs-gallery .ch-cover').first().click();
  const tpl=await p.locator('#csComposerInput').inputValue();
  assert.match(tpl,/产品介绍/);

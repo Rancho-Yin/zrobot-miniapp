@@ -3,7 +3,13 @@ const K = { works: 'zw:works', current: 'zw:current', credits: 'zw:credits', onb
 const SEEDS = [
   { id: 'seed-coffee', title: '门店实拍 · 手冲咖啡', type: 'image', url: CFG.PHOTO.coffee, tag: '图片', scene: '自由创作', date: '9/25' },
   { id: 'seed-event', title: '新品发布 · 门店现场', type: 'image', url: CFG.PHOTO.eventReal, tag: '图片', scene: '自由创作', date: '9/24' },
-  { id: 'seed-video', title: '自然瞬间 · 氛围视频', type: 'video', url: CFG.VIDEO, tag: '视频', scene: '自由创作', date: '9/23' }
+  { id: 'seed-video', title: '自然瞬间 · 氛围视频', type: 'video', url: CFG.VIDEO, tag: '视频', scene: '自由创作', date: '9/23' },
+  { id: 'style-3d', title: '机械觉醒', type: 'image', url: CFG.CDN + 'style-3d.jpg', tag: '图片', styleName: '三维', featured: true, date: '9/22' },
+  { id: 'style-anime', title: '课堂时刻', type: 'image', url: CFG.CDN + 'style-anime.jpg', tag: '图片', styleName: '动漫', featured: true, date: '9/21' },
+  { id: 'style-watercolor', title: '林间光影', type: 'image', url: CFG.CDN + 'style-watercolor.jpg', tag: '图片', styleName: '水彩', featured: true, date: '9/20' },
+  { id: 'style-pixel', title: '落日湖畔', type: 'image', url: CFG.CDN + 'style-pixel.jpg', tag: '图片', styleName: '像素', featured: true, date: '9/19' },
+  { id: 'style-illust', title: '桌上的猫', type: 'image', url: CFG.CDN + 'style-illust.jpg', tag: '图片', styleName: '插画', featured: true, date: '9/18' },
+  { id: 'style-photo', title: '城市暮色', type: 'image', url: CFG.CDN + 'style-photo.jpg', tag: '图片', styleName: '写实', featured: true, date: '9/17' }
 ];
 function read(k, def) { try { const v = wx.getStorageSync(k); return (v === '' || v === null || v === undefined) ? def : v; } catch (e) { return def; } }
 function write(k, v) { try { wx.setStorageSync(k, v); } catch (e) {} }

@@ -17,3 +17,16 @@
 .gap { flex: 1; }
 .send { width: 72rpx; height: 72rpx; border-radius: 50%; background: #c9c4de; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 34rpx; font-weight: 700; }
 .send.on { background: #8848f5; }
+
+.hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80rpx 0; }
+.hero-logo { width: 140rpx; height: 140rpx; border-radius: 36rpx; background: #fff; box-shadow: 0 18rpx 44rpx rgba(36,39,45,.08); }
+.hero-title { margin-top: 30rpx; font-size: 52rpx; font-weight: 800; color: #24272d; }
+.hero-sub { margin-top: 14rpx; font-size: 26rpx; color: #9aa0aa; }
+.page { min-height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; }
+.tools-bar { display: flex; align-items: center; margin: auto 0 16rpx; }
+.tpl-btn { border: 1rpx solid #e3e5ea; background: #fff; color: #3d434b; font-size: 23rpx; padding: 10rpx 30rpx; border-radius: 999rpx; }
+.credit { margin-left: auto; font-size: 22rpx; color: #8b9199; }
+.composer { position: sticky; bottom: 20rpx; }
+.composer .tools { display: flex; align-items: center; gap: 14rpx; }
+.composer .cost { font-size: 20rpx; color: #a4aab2; }
+.composer .gap { flex: 1; }
