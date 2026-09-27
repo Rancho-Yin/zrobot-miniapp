@@ -109,6 +109,8 @@
 .vs-extra { flex-wrap:wrap; }
 .modal-layer .sheet { max-height:calc(100% - 70px);overflow:auto; }
 .ch-account { display:flex;gap:14px;align-items:center;padding:15px 0 27px; }
+button.ch-account { border:0;width:100%;background:transparent;text-align:left;cursor:pointer; }
+button.ch-account>svg:last-child { margin-left:auto;width:16px;color:#a4aab2; }
 .ch-account>span { width:56px;height:56px;display:grid;place-items:center;background:#e5e7ee;border-radius:18px;color:#8a91a0; }
 .ch-account strong { font-size:17px; }
 .ch-account p { margin-top:6px;color:#969daa;font-size:12px; }

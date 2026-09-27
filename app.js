@@ -86,9 +86,9 @@ function assistantAct(t) {
 function handleAssistant(raw) {
   const text = String(raw || '').trim();
   if (!text) return;
+  if (!Credits.spend(1, '屏幕助手对话')) return;
   assistantMessages.push({ role: 'user', text });
   if (state.route === 'home') render();
-  if (!Credits.spend(1, '屏幕助手对话')) return;
   const reply = assistantAct(text);
   setTimeout(() => {
     reply.run?.();
@@ -212,9 +212,9 @@ const quickstartResult = () => `
 const quickstartSuccess = () => `
   <section class="success-screen">
     <span class="success-icon"><i data-lucide="check"></i></span>
-    <p class="screen-label">交互流程演示</p>
-    <h1>屏幕已经活起来了</h1>
-    <p>快速上屏流程演示完成，真实用时与播放回执需接入设备后验证。</p>
+    <p class="screen-label">我的智显屏</p>
+    <h1>上屏成功</h1>
+    <p>屏幕正在播放你刚创建的内容，可回到创作中继续打磨。</p>
   </section>
   <div class="quickstart-result success-preview">${preview()}</div>
   <div class="success-actions">
@@ -286,16 +286,24 @@ const terminalView = () => `
   </div>
   ${state.narrating ? `<div class="robot-live"><img src="assets/zrobot-mark.png" alt="" /><div><strong>正在为现场讲解</strong><p>内容与字幕已同步播放</p></div><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>` : ''}`;
 
-const profileView = () => `
+const profileView = () => {
+  let userName = '本地体验用户', loggedIn = false;
+  try { const user = JSON.parse(localStorage.getItem('zrobot-user')); if (user?.name) { userName = user.name; loggedIn = true; } } catch (_) {}
+  const account = loggedIn
+    ? `<div class="ch-account"><span><i data-lucide="user-round"></i></span><div><strong>${escapeHTML(userName)}</strong><p>已保存 ${ContentHub.count()} 件内容</p></div></div>`
+    : `<button class="ch-account" type="button" data-route="wechat-login"><span><i data-lucide="user-round"></i></span><div><strong>${escapeHTML(userName)}</strong><p>未登录 · 点击使用微信登录</p></div><i data-lucide="chevron-right"></i></button>`;
+  return `
   <section class="ch-page"><h1 class="vs-sr-only">我的</h1>
-  <div class="ch-account"><span><i data-lucide="user-round"></i></span><div><strong>${escapeHTML((() => { try { return JSON.parse(localStorage.getItem('zrobot-user'))?.name || '本地体验用户'; } catch (_) { return '本地体验用户'; } })())}</strong><p>已保存 ${ContentHub.count()} 件内容</p></div></div>
+  ${account}
   <div class="cr-card"><div class="cr-copy"><small>积分余额</small><strong>${Credits.get()}</strong><p>生成画面 2 积分/次 · 屏幕助手 1 积分/次</p></div><button class="cr-recharge" type="button" data-action="open-recharge">充值</button></div>
   <div class="ch-setting-list">
     <button type="button" data-route="home"><i data-lucide="monitor"></i>我的设备与屏幕<i data-lucide="chevron-right"></i></button>
     <button type="button" data-route="library"><i data-lucide="images"></i>我的作品<i data-lucide="chevron-right"></i></button>
     <button type="button" data-action="rebind"><i data-lucide="scan-line"></i>绑定设备<i data-lucide="chevron-right"></i></button>
     <button type="button" data-action="content-help"><i data-lucide="circle-help"></i>使用帮助<i data-lucide="chevron-right"></i></button>
+    ${loggedIn ? '<button type="button" data-action="wx-logout"><i data-lucide="log-out"></i>退出登录<i data-lucide="chevron-right"></i></button>' : ''}
   </div><p class="ch-local-note">当前为本地交互原型，真实账户、计费和设备服务待接入。</p></section>`;
+};
 
 const wechatLoginView = () => `
   <section class="wx-login">
@@ -422,7 +430,18 @@ function runQuickstartPublish() {
     if (value >= 75) document.getElementById('publishStep3').classList.add('done');
     if (value >= 100) {
       window.clearInterval(timer);
-      window.setTimeout(() => { closeSheet(); VisualStudio.clearPublished(); state.quickstartStage = 'success'; render(); }, 300);
+      window.setTimeout(async () => {
+        try {
+          await ContentHub.setStudioPlayback({
+            id: 'v-quickstart', projectId: 'project-quickstart', number: 1,
+            data: { asset: 'assets/scene-gallery.jpg', assetName: '咖啡机示例', scenario: 'free', showText: true, dateText: '', purpose: 'product', scene: 'gallery', style: 'quiet', title: state.title, subtitle: state.subtitle, price: '', prompt: '', motion: 'none', imageUrl: '' }
+          });
+        } catch (_) { showToast('播放状态未保存，请刷新重试'); }
+        Onboard.mark('pub');
+        closeSheet();
+        state.quickstartStage = 'success';
+        render();
+      }, 300);
     }
   }, 330);
 }
@@ -504,6 +523,7 @@ document.addEventListener('click', (event) => {
   if (action === 'chat-go') { ContentHub.setTab?.(actionTarget.dataset.tab === 'templates' ? 'templates' : 'free'); navigate('create'); }
   if (action === 'wx-allow') wxAllowLogin(actionTarget);
   if (action === 'wx-deny') { showToast('已取消登录'); navigate('home'); }
+  if (action === 'wx-logout') { try { localStorage.removeItem('zrobot-user'); } catch (_) {} showToast('已退出登录'); render(); }
   if (action === 'ob-start') { closeSheet(); navigate('create'); }
   if (action === 'ob-finish') { closeSheet(); navigate('home'); }
   if (action === 'orb-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('orbInput'));

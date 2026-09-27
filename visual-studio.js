@@ -114,8 +114,8 @@ window.VisualStudio = (() => {
   }
   function generate() {
     if(busy)return;
-    if(hooks.spend&&!hooks.spend(2,'生成画面'))return;
     if(!draft.title.trim()){issue='请先填写主标题。';panel='text';repaint();return;}
+    if(hooks.spend&&!hooks.spend(2,'生成画面'))return;
     busy=true;issue='';playing=false;panel=null;
     const snapshot=copy(draft), token=++job;
     let noapi=false; try{noapi=localStorage.getItem('zrobot-noapi')==='1';}catch(_){}
@@ -164,8 +164,9 @@ window.VisualStudio = (() => {
     setTimeout(async()=>{
       try{
         await hooks.published?.(copy(snapshot));
-        published=snapshot;persist();hooks.closeSheet?.();
-        hooks.openSheet?.('<div class="success-mark"><i data-lucide="check"></i></div><h2>上屏演示完成</h2><button class="vs-primary" type="button" data-vs="finish">查看屏幕</button>');
+        published=snapshot;persist();
+        hooks.closeSheet?.();
+        if(!hooks.onboard?.('pub'))hooks.openSheet?.('<div class="success-mark"><i data-lucide="check"></i></div><h2>上屏成功</h2><p>我的智显屏正在播放最新内容。</p><button class="vs-primary" type="button" data-vs="finish">查看屏幕</button>');
       }catch(_){hooks.closeSheet?.();hooks.toast?.('上屏未完成，当前播放未改变');}
       finally{busy=false;}
     },950);
