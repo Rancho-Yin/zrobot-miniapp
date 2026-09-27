@@ -2,12 +2,14 @@ const store = require('../../utils/store');
 const ai = require('../../utils/ai');
 const CFG = require('../../utils/config');
 Page({
-  data: { showTpl: false, input: '', credits: 0, themes: [], busy: false },
+  data: { showTpl: false, showModel: false, modelName: '智显海报模型', input: '', credits: 0, themes: [], busy: false },
   onLoad() {
     this.setData({ credits: store.getCredits(), themes: CFG.THEMES.map(t => Object.assign({}, t, { img: t.img })) });
   },
   onShow() { this.setData({ credits: store.getCredits() }); },
   toggleTpl() { this.setData({ showTpl: !this.data.showTpl }); },
+  pickModel() { this.setData({ showModel: !this.data.showModel }); },
+  setModel(e) { this.setData({ modelName: e.currentTarget.dataset.name, showModel: false }); },
   onInput(e) { this.setData({ input: e.detail.value }); },
   useChip(e) { this.setData({ input: e.currentTarget.dataset.text }); },
   useTheme(e) {
@@ -32,6 +34,9 @@ Page({
     const title = text.split(/[。；;！!？?\n]/)[0].trim().slice(0, 18) || '未命名作品';
     this.setData({ busy: true });
     wx.showLoading({ title: '正在生成真实画面…', mask: true });
+    if (this.data.modelName.indexOf('短视频') > -1 || this.data.modelName.indexOf('文档') > -1) {
+      wx.showToast({ title: '该模型即将上线，先用海报模型生成', icon: 'none' });
+    }
     ai.generate(text).then(url => {
       wx.hideLoading();
       if (!url) {

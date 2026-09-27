@@ -39,7 +39,8 @@ await step('04 一句话生成（模拟）→ 版本 1 → 扣 2 积分 → 引�
   assert.equal(await p.evaluate(()=>Number(localStorage.getItem('zrobot-credits-v1'))),18);
 });
 await step('05 改信息 + 保存版本 → 版本 2（编辑不扣积分）',async()=>{
-  await p.getByRole('button',{name:'改信息',exact:true}).click();
+  await p.locator('[data-vs="panel"][data-panel="more"]').click();
+ await p.locator('.vs-tray [data-vs="panel"][data-panel="text"]').click();
   await p.locator('#vsTextForm [name="title"]').fill('闭环作品');
   await p.getByRole('button',{name:'完成',exact:true}).click();
   await p.getByRole('button',{name:'保存版本',exact:true}).click();

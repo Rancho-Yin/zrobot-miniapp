@@ -469,10 +469,10 @@ button.ch-account>svg:last-child { margin-left:auto;width:16px;color:#a4aab2; }
 
 /* 生成界面：ChatGPT 式纯净 Hero。 */
 .cs-page { min-height: 100vh; display: flex; flex-direction: column; }
-.cs-hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40rpx 0 80rpx; }
-.cs-hero-logo { width: 140rpx; height: 140rpx; border-radius: 36rpx; background: #fff; box-shadow: 0 18rpx 44rpx rgba(36,39,45,.08); }
-.cs-hero-title { margin: 30rpx 0 0; font-size: 52rpx; font-weight: 800; letter-spacing: -1rpx; color: #24272d; }
-.cs-hero-sub { margin: 16rpx 0 0; font-size: 26rpx; color: #9aa0aa; }
+.cs-hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 0 80px; }
+.cs-hero-logo { width: 140px; height: 140px; border-radius: 36px; background: #fff; box-shadow: 0 18px 44px rgba(36,39,45,.08); }
+.cs-hero-title { margin: 30px 0 0; font-size: 52px; font-weight: 800; letter-spacing: -1px; color: #24272d; }
+.cs-hero-sub { margin: 16px 0 0; font-size: 26px; color: #9aa0aa; }
 .cs-head-actions { margin-left: auto; display: flex; align-items: center; gap: 12rpx; }
 .ch-tpl-btn { border: 1rpx solid #e3e5ea; background: #fff; color: #3d434b; font-size: 23rpx; padding: 8rpx 22rpx; border-radius: 999rpx; cursor: pointer; }
 .ch-tpl-btn:hover { background: #f4f5f8; }
@@ -486,3 +486,69 @@ button.ch-account>svg:last-child { margin-left:auto;width:16px;color:#a4aab2; }
 .ob-strip .ob-hide svg { width: 12px; height: 12px; }
 
 .ch-fab { position:sticky !important; bottom:24px; align-self:flex-end; border-radius:50%; background:#26262b !important; box-shadow:0 14px 30px rgba(38,38,43,.35); margin-top:18px; }
+.cs-model { display: flex; align-items: center; gap: 4px; border: 0; background: transparent; color: #565d66; font-size: 20px; cursor: pointer; white-space: nowrap; padding: 4px 6px; border-radius: 10px; }
+.cs-model:hover { background: rgba(255,255,255,.6); }
+.cs-model svg { width: 14px; height: 14px; flex-shrink: 0; }
+.cs-model span { max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+.cs-model-list { display: grid; gap: 8px; }
+.cs-model-item { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid #e3e5ea; border-radius: 14px; background: #fff; cursor: pointer; text-align: left; }
+.cs-model-item.on { border-color: #8848f5; background: #f8f6fe; }
+.cs-model-item svg { width: 16px; height: 16px; flex-shrink: 0; color: #8848f5; }
+.cs-model-item span { flex: 1; min-width: 0; }
+.cs-model-item strong { display: block; font-size: 13.5px; color: #24272d; }
+.cs-model-item small { display: block; margin-top: 3px; font-size: 11.5px; color: #8b9199; }
+.cs-model-note { margin: 12px 2px 0; font-size: 11px; color: #a4aab2; }
+
+/* 格式 / 风格选择行（生成界面顶部）。 */
+.cs-fmt-row,.cs-style-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; padding: 2px; }
+.cs-fmt-row::-webkit-scrollbar,.cs-style-row::-webkit-scrollbar { display: none; }
+.cs-fmt-row button,.cs-style-row button { flex-shrink: 0; min-height: 40px; padding: 0 20px; border: 1px solid #e3e5ea; border-radius: 999px; background: #fff; color: #3d434b; font-size: 13px; cursor: pointer; }
+.cs-fmt-row button[aria-pressed=true],.cs-style-row button[aria-pressed=true] { background: #24272d; border-color: #24272d; color: #fff; font-weight: 600; }
+.cs-tpl-row { margin: 0 0 14px; }
+.cs-tpl-row { display: none; }
+
+/* 详情页双按钮。 */
+.ch-btn-duo { display: flex; gap: 12px; }
+.ch-btn-duo .ch-primary { flex: 1.4; }
+.ch-secondary { flex: 1; background: #23252b; color: #e7e8eb; border: 0; border-radius: 16px; padding: 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+/* 模型选择。 */
+.cs-model { display: flex; align-items: center; gap: 4px; border: 0; background: transparent; color: #8b9199; font-size: 12px; cursor: pointer; white-space: nowrap; padding: 4px 6px; border-radius: 10px; }
+.cs-model:hover { background: rgba(255,255,255,.55); }
+.cs-model svg { width: 13px; height: 13px; flex-shrink: 0; }
+.cs-model span { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+.cs-model-list { display: grid; gap: 8px; }
+.cs-model-item { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border: 1px solid #e3e5ea; border-radius: 14px; background: #fff; cursor: pointer; text-align: left; }
+.cs-model-item.on { border-color: #8848f5; background: #f8f6fe; }
+.cs-model-item svg { width: 16px; height: 16px; flex-shrink: 0; color: #8848f5; }
+.cs-model-item span { flex: 1; min-width: 0; }
+.cs-model-item strong { display: block; font-size: 13.5px; color: #24272d; }
+.cs-model-item small { display: block; margin-top: 3px; font-size: 11.5px; color: #8b9199; }
+.cs-model-note { margin: 12px 2px 0; font-size: 11px; color: #a4aab2; }
+
+/* 我的页总览条。 */
+.pf-stats { display: flex; gap: 10px; margin-top: 14px; }
+.pf-stats>div { flex: 1; background: #fff; border-radius: 18px; padding: 14px 10px; text-align: center; }
+.pf-stats b { display: block; font-size: 26px; font-weight: 800; color: #24272d; }
+.pf-stats span { display: block; margin-top: 2px; font-size: 11px; color: #8b9199; }
+
+/* 内容编排面板。 */
+.change-duo { display: flex; gap: 12rpx; margin-bottom: 18rpx; }
+.change-duo button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 10rpx; background: #17181c; color: #fff; border: 0; border-radius: 20rpx; padding: 24rpx 0; font-size: 27rpx; font-weight: 600; cursor: pointer; }
+.pl-panel { background: #fff; border-radius: 24rpx; padding: 20rpx; margin-top: 18rpx; }
+.pl-head { display: flex; align-items: center; gap: 10rpx; padding-bottom: 12rpx; border-bottom: 1rpx solid #f0f1f4; }
+.pl-head strong { font-size: 28rpx; }
+.pl-head small { color: #8b9199; font-size: 21rpx; }
+.pl-close { margin-left: auto; border: 0; background: none; color: #9499a1; font-size: 26rpx; cursor: pointer; }
+.pl-list { display: grid; gap: 10rpx; padding: 14rpx 0 4rpx; }
+.pl-item { display: flex; align-items: center; gap: 14rpx; padding: 12rpx; border: 1rpx solid #eef0f3; border-radius: 16rpx; }
+.pl-item.now { border-color: #8848f5; background: #faf8ff; }
+.pl-thumb { width: 84rpx; height: 60rpx; border-radius: 10rpx; object-fit: cover; background: #eef0f3; }
+.pl-copy { flex: 1; min-width: 0; }
+.pl-copy strong { display: block; font-size: 25rpx; color: #24272d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-copy small { color: #8b9199; font-size: 21rpx; }
+.pl-item button { border: 0; background: #f1f2f5; border-radius: 10rpx; min-width: 52rpx; height: 52rpx; font-size: 24rpx; cursor: pointer; color: #40454d; }
+.pl-item .pl-use { width: auto; padding: 0 18rpx; background: #8848f5; color: #fff; font-size: 22rpx; }
+.pl-item button:disabled { opacity: .35; cursor: default; }
+.pl-empty { text-align: center; color: #8b9199; padding: 20rpx 0; }
+.pl-note { margin: 14rpx 0 0; font-size: 20rpx; color: #a4aab2; }

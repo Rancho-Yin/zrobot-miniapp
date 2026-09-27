@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'method not allowed' });
 
-  const { prompt, size } = req.body || {};
+  const { prompt, size, model: modelReq } = req.body || {};
   const text = String(prompt || '').trim();
   if (!text || text.length > 600) return res.status(400).json({ error: 'invalid prompt' });
   const allowed = ['1024x1024', '1536x1024', '1024x1536'];
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   const base = process.env.IMAGE_API_BASE;
   const key = process.env.IMAGE_API_KEY;
-  const model = process.env.IMAGE_MODEL || 'gpt-image-2';
+  const model = modelReq === 'fast' ? 'gpt-image-2' : (process.env.IMAGE_MODEL || 'gpt-image-2');
   if (!base || !key) return res.status(500).json({ error: 'server not configured' });
 
   try {

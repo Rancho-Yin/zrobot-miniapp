@@ -14,7 +14,8 @@ for(const width of [390,360,1440]){
  await p.locator('[data-hub="quick-create"]').click();
  await p.locator('#vsPrompt').waitFor({timeout:2500});
  await p.waitForFunction(()=>VisualStudio.getProject().versions.length===1);
- await p.getByRole('button',{name:'改信息',exact:true}).click();
+ await p.locator('[data-vs="panel"][data-panel="more"]').click();
+ await p.locator('.vs-tray [data-vs="panel"][data-panel="text"]').click();
  await p.locator('#vsTextForm [name="title"]').fill('周末活动');
  await p.locator('#vsTextForm [name="subtitle"]').fill('门店精选商品');
  await p.locator('#vsTextForm [name="price"]').fill('¥399');

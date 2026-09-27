@@ -4,7 +4,7 @@ const toast = document.getElementById('toast');
 
 const params = new URLSearchParams(location.search);
 const state = {
-  route: params.get('login') === 'wechat' ? 'wechat-login' : (['studio','gallery','library','home','profile','project-history','wechat-login'].includes(params.get('view')) ? params.get('view') : 'library'),
+  route: params.get('login') === 'wechat' ? 'wechat-login' : (['studio','gallery','library','home','profile','project-history','wechat-login','create'].includes(params.get('view')) ? params.get('view') : 'library'),
   terminalOnline: true,
   selectedTemplate: 'product',
   digitalHuman: true,
@@ -49,6 +49,7 @@ const Credits = {
   }
 };
 
+let arrangeOpen = false;
 const assistantMessages = [];
 let orbOpen = false;
 const orbLayer = document.createElement('div');
@@ -166,11 +167,16 @@ const homeView = () => `<div class="home-wrap">
     <div class="screen-meta"><div><strong>${state.narrating ? '数字人正在讲解' : escapeHTML(ContentHub.getPlayback()?.title || VisualStudio.getPublished()?.data.title || '品牌产品介绍')}</strong><span>${ContentHub.getPlayback()||VisualStudio.getPublished() ? '上屏演示 · 未连接盒子' : state.narrating ? '内容与讲解同步播放' : '刚刚更新'}</span></div><span>16:9</span></div>
   </div>
 
-  <button class="update-screen" type="button" data-route="library">
-    <span><i data-lucide="image-plus"></i></span>
-    <div><strong>更换内容</strong></div>
+  <button class="update-screen" type="button" data-action="toggle-arrange">
+    <span><i data-lucide="list-video"></i></span>
+    <div><strong>内容编排</strong></div>
     <i data-lucide="arrow-right"></i>
   </button>
+  <div class="change-duo">
+    <button type="button" data-route="library"><i data-lucide="image-plus"></i>更换内容</button>
+    <button type="button" data-action="toggle-arrange"><i data-lucide="list-music"></i>播放列表</button>
+  </div>
+  ${arrangeOpen ? arrangePanel() : ''}
 
   <div class="screen-tools cols-3">
     <button type="button" data-route="terminal"><i data-lucide="sliders-horizontal"></i><span><strong>现场遥控</strong></span></button>
@@ -179,6 +185,27 @@ const homeView = () => `<div class="home-wrap">
   </div>
 
   ${assistantChatBlock()}</div>`;
+
+function arrangePanel() {
+  const plays = (ContentHub.listAll ? ContentHub.listAll() : []).filter(w => w.type === 'image' || (w.type === 'video' && w.previewReady !== false));
+  const order = (() => { try { return JSON.parse(localStorage.getItem('zrobot-playlist')) || []; } catch (_) { return []; } })();
+  const list = order.map(id => plays.find(w => w.id === id)).filter(Boolean).concat(plays.filter(w => !order.includes(w.id)));
+  const cur = ContentHub.getPlayback();
+  return `<div class="pl-panel"><div class="pl-head"><strong>内容编排</strong><small>上下调整播放顺序 · 点击设为当前画面</small><button class="pl-close" type="button" data-action="toggle-arrange" aria-label="关闭"><i data-lucide="x"></i></button></div>${list.length ? `<div class="pl-list">${list.map((w, i) => `<div class="pl-item ${cur && cur.id === w.id ? 'now' : ''}"><image class="pl-thumb" src="${w.imageUrl || w.url || ''}" mode="aspectFill"/><div class="pl-copy"><strong>${escapeHTML(w.title)}</strong><small>${w.type === 'video' ? '视频' : '图片'} · ${w.styleName || w.scene || '自由创作'}</small></div><button class="pl-up" type="button" data-action="pl-up" data-id="${w.id}" aria-label="上移" ${i === 0 ? 'disabled' : ''}>↑</button><button class="pl-down" type="button" data-action="pl-down" data-id="${w.id}" aria-label="下移" ${i === list.length - 1 ? 'disabled' : ''}>↓</button><button class="pl-use" type="button" data-action="pl-use" data-id="${w.id}">设为当前</button></div>`).join('')}</div>` : '<p class="pl-empty">内容库还没有可编排的内容</p>'}<p class="pl-note">编排顺序即屏幕轮播顺序 · 演示说明，未连接设备</p></div>`;
+}
+function plAction(id, dir) {
+  try {
+    const order = JSON.parse(localStorage.getItem('zrobot-playlist')) || [];
+    const works = (ContentHub.listAll ? ContentHub.listAll() : []).filter(w => w.type === 'image' || (w.type === 'video' && w.previewReady !== false)).map(w => w.id);
+    const seq = order.filter(id => works.includes(id)).concat(works.filter(id => !order.includes(id)));
+    const i = seq.indexOf(id), j = i + dir;
+    if (i < 0 || j < 0 || j >= seq.length) return;
+    [seq[i], seq[j]] = [seq[j], seq[i]];
+    localStorage.setItem('zrobot-playlist', JSON.stringify(seq));
+  } catch (_) {}
+  render();
+}
+function plUse(id) { const w = ContentHub.getWork(id); if (w) { ContentHub.setCurrent(w); render(); showToast('已设为当前画面'); } }
 
 const quickstartProgress = () => `
   <div class="quickstart-progress" aria-label="快速上屏进度">
@@ -297,10 +324,7 @@ const profileView = () => {
   ${account}
   <div class="cr-card"><div class="cr-copy"><small>积分余额</small><strong>${Credits.get()}</strong><p>生成画面 2 积分/次 · 屏幕助手 1 积分/次</p></div><button class="cr-recharge" type="button" data-action="open-recharge">充值</button></div>
   <div class="ch-setting-list">
-    <button type="button" data-route="home"><i data-lucide="monitor"></i>我的设备与屏幕<i data-lucide="chevron-right"></i></button>
-    <button type="button" data-route="library"><i data-lucide="images"></i>我的作品<i data-lucide="chevron-right"></i></button>
     <button type="button" data-action="rebind"><i data-lucide="scan-line"></i>绑定设备<i data-lucide="chevron-right"></i></button>
-    <button type="button" data-action="content-help"><i data-lucide="circle-help"></i>使用帮助<i data-lucide="chevron-right"></i></button>
     ${loggedIn ? '<button type="button" data-action="wx-logout"><i data-lucide="log-out"></i>退出登录<i data-lucide="chevron-right"></i></button>' : ''}
   </div><p class="ch-local-note">当前为本地交互原型，真实账户、计费和设备服务待接入。</p></section>`;
 };
@@ -524,6 +548,10 @@ document.addEventListener('click', (event) => {
   if (action === 'wx-allow') wxAllowLogin(actionTarget);
   if (action === 'wx-deny') { showToast('已取消登录'); navigate('home'); }
   if (action === 'wx-logout') { try { localStorage.removeItem('zrobot-user'); } catch (_) {} showToast('已退出登录'); render(); }
+  if (action === 'toggle-arrange') { arrangeOpen = !arrangeOpen; render(); }
+  if (action === 'pl-up') { plAction(actionTarget.dataset.id, -1); }
+  if (action === 'pl-down') { plAction(actionTarget.dataset.id, 1); }
+  if (action === 'pl-use') { if (ContentHub.playWork(actionTarget.dataset.id)) { render(); showToast('已设为当前画面'); } else { showToast('该内容暂不可直接播放'); } }
   if (action === 'ob-start') { closeSheet(); navigate('create'); }
   if (action === 'ob-finish') { closeSheet(); navigate('home'); }
   if (action === 'orb-voice') window.ZVoice?.toggle(actionTarget, document.getElementById('orbInput'));

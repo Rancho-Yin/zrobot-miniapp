@@ -15,7 +15,8 @@
     <textarea class="input" value="{{input}}" placeholder="描述你想生成的画面…" maxlength="200" bindinput="onInput" auto-height/>
     <view class="tools">
       <view class="tool" bindtap="upload">+</view>
-      <text class="cost">生成消耗 {{credits >= 0 ? 2 : 2}} 积分</text>
+      <view class="tool" bindtap="pickModel">{{modelName}} ▾</view>
+      <text class="cost">2 积分/次</text>
       <view class="gap"></view>
       <view class="tool" bindtap="mic">语音</view>
       <view class="send {{input ? 'on' : ''}}" bindtap="send">↑</view>

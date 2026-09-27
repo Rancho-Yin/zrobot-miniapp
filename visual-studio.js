@@ -89,7 +89,7 @@ window.VisualStudio = (() => {
       ${hasResult?`<div class="vs-scroll">
         <div class="vs-result-meta"><button type="button" data-vs="panel" data-panel="style"><span class="vs-style-dot style-${draft.style}"></span>${CreationScenarios.name(draft.scenario)}</button><span>16:9</span></div>
         <div class="vs-canvas">${artwork(draft,playing)}<span class="vs-version-badge">v${version?.number||1} / ${versions.length}${dirty?' · 已调整':''}</span>${versions.length>1?`<button class="vs-canvas-arrow prev" type="button" data-vs="previous" aria-label="上一个版本"><i data-lucide="chevron-left"></i></button><button class="vs-canvas-arrow next" type="button" data-vs="next" aria-label="下一个版本"><i data-lucide="chevron-right"></i></button>`:''}${busy?`<div class="vs-working" role="status"><span></span>${realBusy?'正在生成真实画面，约 20~40 秒…':'正在组合演示画面…'}</div>`:''}</div>
-        <div class="vs-quick-actions"><button type="button" data-vs="panel" data-panel="text"><i data-lucide="square-pen"></i>${draft.showText?'改信息':'改名称'}</button><button type="button" data-vs="panel" data-panel="asset"><i data-lucide="image"></i>换图片</button>${dirty?'<button type="button" data-vs="save-version">保存版本</button>':''}</div>
+        <div class="vs-quick-actions">${dirty?'<button type="button" data-vs="save-version"><i data-lucide="save"></i>保存版本</button>':''}<button type="button" data-vs="preview"><i data-lucide="monitor-up"></i>上屏演示</button></div>
         <div class="vs-filmstrip" aria-label="版本历史">${versions.length>1?versions.map(v=>`<button type="button" data-vs="restore" data-id="${v.id}" aria-label="查看版本 ${v.number}" aria-pressed="${selected===v.id}">${artwork(v.data,false)}<span>v${v.number}</span></button>`).join(''):''}</div>
         <details class="vs-records"><summary>创作记录<span>${versions.length}</span></summary>${[...versions].reverse().map(v=>`<article><header><strong>版本 ${v.number}</strong>${v.createdAt?`<time>${new Date(v.createdAt).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</time>`:''}</header>${v.request?`<small>你</small><p class="vs-user-request">${esc(v.request)}</p>`:''}${v.changes?.length?`<small>修改记录</small><p>${v.changes.map(esc).join('；')}</p>`:''}<p class="vs-record-result">${v.request?'要求已记录 · AI处理为演示':v.changes?.length?'已保存画面调整':`系统记录 · ${esc(v.note||'已生成版本')}`}</p></article>`).join('')}</details>
         ${!saved?'<p class="vs-error" role="alert">浏览器存储空间不足，当前调整未保存。</p>':''}
@@ -105,10 +105,10 @@ window.VisualStudio = (() => {
   const API_URL='https://zrobot-miniapp.vercel.app/api/generate';
   let realBusy=false;
   function shrink(dataUrl){return new Promise(res=>{const img=new Image();img.onload=()=>{try{const w=Math.min(1024,img.width),h=Math.max(1,Math.round(img.height*w/img.width));const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',0.72));}catch(_){res(dataUrl);}};img.onerror=()=>res(dataUrl);img.src=dataUrl;});}
-  function realGenerate(prompt){
+  function realGenerate(prompt,model){
     const ctrl=new AbortController();
     const killer=setTimeout(()=>ctrl.abort(),45000);
-    return fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,size:'1024x1024'}),signal:ctrl.signal})
+    return fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,size:'1024x1024',model:model||'poster'}),signal:ctrl.signal})
       .then(async r=>{clearTimeout(killer);const j=await r.json().catch(()=>null);return j&&j.imageUrl?j.imageUrl:null;})
       .catch(()=>{clearTimeout(killer);return null;});
   }
@@ -117,9 +117,13 @@ window.VisualStudio = (() => {
     if(!draft.title.trim()){issue='请先填写主标题。';panel='text';repaint();return;}
     if(hooks.spend&&!hooks.spend(2,'生成画面'))return;
     busy=true;issue='';playing=false;panel=null;
+    let csStyle=null; try{csStyle=localStorage.getItem('zrobot-create-style');}catch(_){}
+    if(csStyle&&choices.style.some(c=>c[0]===csStyle)&&draft.style!==csStyle){draft.style=csStyle;markChange('风格：'+label('style',csStyle));}
+    let csFmt='image'; try{csFmt=localStorage.getItem('zrobot-create-format')||'image';}catch(_){}
     const snapshot=copy(draft), token=++job;
     let noapi=false; try{noapi=localStorage.getItem('zrobot-noapi')==='1';}catch(_){}
-    const promptText=[snapshot.title,snapshot.subtitle,snapshot.prompt].filter(Boolean).join('。');
+    const fmtName={image:'',video:'短视频',slides:'PPT / PDF',word:'Word',html:'网页'}[csFmt]||'';
+    const promptText=[snapshot.title,snapshot.subtitle,snapshot.prompt].filter(Boolean).join('。')+(fmtName?`（${fmtName}格式，模型即将上线，先以海报画面呈现）`:'');
     const finish=(data,note,real)=>{ if(token!==job)return;
       addVersion(data,note);
       busy=false;realBusy=false;dirty=JSON.stringify(snapshot)!==JSON.stringify(draft);draft.prompt='';persist();repaint();
@@ -136,7 +140,10 @@ window.VisualStudio = (() => {
     repaint();
     if(noapi){simulate(false);return;}
     realBusy=true;repaint();
-    realGenerate(promptText).then(url=>{ if(token!==job)return;
+    let modelChoice='poster'; try{modelChoice=localStorage.getItem('zrobot-model')||'poster';}catch(_){}
+    if(modelChoice!=='poster'&&modelChoice!=='fast')hooks.toast?.('该模型即将上线，先用图片模型生成');
+    const useModel=(modelChoice==='fast')?'fast':'poster';
+    realGenerate(promptText,useModel).then(url=>{ if(token!==job)return;
       if(!url){simulate(true);return;}
       shrink(url).then(small=>{ if(token!==job)return; const d=copy(snapshot); d.imageUrl=small; finish(d,snapshot.prompt||snapshot.title,true); });
     }).catch(()=>{ if(token!==job)return; simulate(true); });
