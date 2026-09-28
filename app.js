@@ -167,14 +167,9 @@ const homeView = () => `<div class="home-wrap">
     <div class="screen-meta"><div><strong>${state.narrating ? '数字人正在讲解' : escapeHTML(ContentHub.getPlayback()?.title || VisualStudio.getPublished()?.data.title || '品牌产品介绍')}</strong><span>${ContentHub.getPlayback()||VisualStudio.getPublished() ? '上屏演示 · 未连接盒子' : state.narrating ? '内容与讲解同步播放' : '刚刚更新'}</span></div><span>16:9</span></div>
   </div>
 
-  <button class="update-screen" type="button" data-action="toggle-arrange">
-    <span><i data-lucide="list-video"></i></span>
-    <div><strong>内容编排</strong></div>
-    <i data-lucide="arrow-right"></i>
-  </button>
   <div class="change-duo">
     <button type="button" data-route="library"><i data-lucide="image-plus"></i>更换内容</button>
-    <button type="button" data-action="toggle-arrange"><i data-lucide="list-music"></i>播放列表</button>
+    <button type="button" data-action="toggle-arrange"><i data-lucide="list-music"></i>内容编排</button>
   </div>
   ${arrangeOpen ? arrangePanel() : ''}
 
@@ -191,7 +186,7 @@ function arrangePanel() {
   const order = (() => { try { return JSON.parse(localStorage.getItem('zrobot-playlist')) || []; } catch (_) { return []; } })();
   const list = order.map(id => plays.find(w => w.id === id)).filter(Boolean).concat(plays.filter(w => !order.includes(w.id)));
   const cur = ContentHub.getPlayback();
-  return `<div class="pl-panel"><div class="pl-head"><strong>内容编排</strong><small>上下调整播放顺序 · 点击设为当前画面</small><button class="pl-close" type="button" data-action="toggle-arrange" aria-label="关闭"><i data-lucide="x"></i></button></div>${list.length ? `<div class="pl-list">${list.map((w, i) => `<div class="pl-item ${cur && cur.id === w.id ? 'now' : ''}"><image class="pl-thumb" src="${w.imageUrl || w.url || ''}" mode="aspectFill"/><div class="pl-copy"><strong>${escapeHTML(w.title)}</strong><small>${w.type === 'video' ? '视频' : '图片'} · ${w.styleName || w.scene || '自由创作'}</small></div><button class="pl-up" type="button" data-action="pl-up" data-id="${w.id}" aria-label="上移" ${i === 0 ? 'disabled' : ''}>↑</button><button class="pl-down" type="button" data-action="pl-down" data-id="${w.id}" aria-label="下移" ${i === list.length - 1 ? 'disabled' : ''}>↓</button><button class="pl-use" type="button" data-action="pl-use" data-id="${w.id}">设为当前</button></div>`).join('')}</div>` : '<p class="pl-empty">内容库还没有可编排的内容</p>'}<p class="pl-note">编排顺序即屏幕轮播顺序 · 演示说明，未连接设备</p></div>`;
+  return `<div class="pl-panel"><div class="pl-head"><strong>内容编排</strong><small>上下调整播放顺序 · 点击设为当前画面</small><button class="pl-close" type="button" data-action="toggle-arrange" aria-label="关闭"><i data-lucide="x"></i></button></div>${list.length ? `<div class="pl-list">${list.map((w, i) => `<div class="pl-item ${cur && cur.id === w.id ? 'now' : ''}"><img class="pl-thumb" src="${w.imageUrl || w.url || ''}" alt=""/><div class="pl-copy"><strong>${escapeHTML(w.title)}</strong><small>${w.type === 'video' ? '视频' : '图片'} · ${w.styleName || w.scene || '自由创作'}</small></div><button class="pl-up" type="button" data-action="pl-up" data-id="${w.id}" aria-label="上移" ${i === 0 ? 'disabled' : ''}>↑</button><button class="pl-down" type="button" data-action="pl-down" data-id="${w.id}" aria-label="下移" ${i === list.length - 1 ? 'disabled' : ''}>↓</button><button class="pl-use" type="button" data-action="pl-use" data-id="${w.id}">设为当前</button></div>`).join('')}</div>` : '<p class="pl-empty">内容库还没有可编排的内容</p>'}<p class="pl-note">编排顺序即屏幕轮播顺序 · 演示说明，未连接设备</p></div>`;
 }
 function plAction(id, dir) {
   try {
